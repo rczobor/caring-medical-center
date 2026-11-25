@@ -105,16 +105,16 @@ const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-b
     <!-- Above the season's snow (z-1), below its snowbank (z-3). -->
     <div class="hero-copy relative z-[2] mx-auto max-w-6xl px-4 pt-6 pb-6 sm:pt-8 lg:py-20">
       <div class="lg:w-[52%] lg:pr-6">
-        <h1 id="fooldal-cim" class="font-display text-[clamp(2.25rem,6vw,4.75rem)] leading-[0.98] font-semibold tracking-[-0.035em] text-balance">{home.heading}</h1>
-        <p class="mt-4 max-w-[30rem] text-lg text-mist sm:mt-5 sm:text-xl">{home.lead}</p>
-        <div class="mt-6 flex flex-wrap gap-3 sm:mt-7">
+        <h1 id="fooldal-cim" data-snow-quiet class="font-display text-[clamp(2.25rem,6vw,4.75rem)] leading-[0.98] font-semibold tracking-[-0.035em] text-balance">{home.heading}</h1>
+        <p data-snow-quiet class="mt-4 max-w-[30rem] text-lg text-mist sm:mt-5 sm:text-xl">{home.lead}</p>
+        <div data-snow-quiet class="mt-6 flex flex-wrap gap-3 sm:mt-7">
           <a href="#diagnosztika" class="inline-flex h-11 items-center rounded-full bg-gold px-6 font-bold text-ink hover:brightness-105">{t.home.exams}</a>
           <a href={link('/arak')} class="inline-flex h-11 items-center rounded-full border-[1.5px] border-cream/60 px-6 font-bold hover:border-cream">{t.home.prices}</a>
         </div>
-        {/* .perch: in season, snowflakes settle on its rule (lib/snow.ts). */}
+        {/* In season, snowflakes settle on the .perch rule and fade behind data-snow-quiet copy (lib/snow.ts). */}
         {
           priceFacts.length > 0 && (
-            <dl class="perch mt-6 grid grid-cols-3 gap-x-4 border-t border-cream/15 pt-4 sm:mt-9 sm:pt-5">
+            <dl data-snow-quiet class="perch mt-6 grid grid-cols-3 gap-x-4 border-t border-cream/15 pt-4 sm:mt-9 sm:pt-5">
               {priceFacts.map(({ label, amount, page }) => (
                 <div class="link-card group relative grid content-start gap-1">
                   {/* Each figure opens its price list; the label's link covers the whole item. */}

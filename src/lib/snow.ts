@@ -1,10 +1,11 @@
 /**
  * Falling snow for the home hero's Christmas season, drawn on one canvas.
  *
- * Tuned against iOS Weather's snow: five depths, most flakes faint distant specks, nearer ones
+ * Tuned against iOS Weather's snow: four depths, most flakes faint distant specks, nearer ones
  * bigger and faster; crisp, irregular clumps that tumble; each flake on its own slight slant with
  * a small, quick flutter; calm air with a rare gentle gust. Some flakes land on `.perch` edges
- * and melt; moving the pointer through the snow stirs it.
+ * and melt; moving the pointer through the snow stirs it. Flakes passing behind
+ * `[data-snow-quiet]` copy fade to a third, so none sits on a letter like an accent mark.
  *
  * It costs battery, so it runs only while the hero is on screen and the tab is visible. With
  * reduced motion it draws one still frame.
@@ -76,6 +77,16 @@ interface Settled {
   life: number;
 }
 
+/** A flake's opacity behind quiet copy. */
+const QUIET_ALPHA = 0.3;
+
+interface Box {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
 interface Edge {
   left: number;
   right: number;
@@ -135,6 +146,7 @@ export function startSnow(canvas: HTMLCanvasElement) {
   let flakes: Flake[] = [];
   let settled: Settled[] = [];
   let edges: Edge[] = [];
+  let quiet: Box[] = [];
   let rampStart = performance.now() / 1000;
   let last = performance.now();
   let raf = 0;
@@ -178,6 +190,11 @@ export function startSnow(canvas: HTMLCanvasElement) {
         return { left: r.left - box.left, right: r.right - box.left, top: r.top - box.top };
       })
       .filter((e) => e.right - e.left > 60);
+    // With a few px of margin, so a flake fades before it touches a glyph.
+    quiet = [...scene.querySelectorAll('[data-snow-quiet]')].map((el) => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left - box.left - 6, right: r.right - box.left + 6, top: r.top - box.top - 6, bottom: r.bottom - box.top + 6 };
+    });
   }
 
   function resize() {
@@ -283,7 +300,8 @@ export function startSnow(canvas: HTMLCanvasElement) {
       } else {
         ctx.setTransform(scale, 0, 0, scale, x * scale, f.y * scale);
       }
-      ctx.globalAlpha = Math.min(1, f.a * ramp + f.glint * 0.4);
+      const hush = quiet.some((q) => x > q.left && x < q.right && f.y > q.top && f.y < q.bottom) ? QUIET_ALPHA : 1;
+      ctx.globalAlpha = Math.min(1, f.a * ramp + f.glint * 0.4) * hush;
       ctx.drawImage(f.sprite, -d / 2, -d / 2, d, d);
     }
     ctx.globalAlpha = 1;
