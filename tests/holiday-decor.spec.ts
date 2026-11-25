@@ -162,6 +162,21 @@ test('with a small default text size on a phone, the lights still hang clear of 
   expect(lowestBulb).toBeLessThanOrEqual(photo.y + 2);
 });
 
+/** How many pages the home page prints on, on A4. */
+async function printedPages(page: Page, season: string) {
+  await page.goto(`/?season=${season}`);
+  // Lazy images below the fold would otherwise print as empty boxes of uneven height.
+  await page.evaluate(() => Promise.all([...document.images].map((img) => ((img.loading = 'eager'), img.decode().catch(() => {})))));
+  const pdf = await page.pdf({ format: 'A4' });
+  return pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)?.length ?? 0;
+}
+
+test('printed in season, the home page keeps its size: as many pages as the plain one', async ({ page }) => {
+  const plain = await printedPages(page, 'off');
+  expect(plain).toBeGreaterThan(2);
+  expect(await printedPages(page, 'christmas')).toBe(plain);
+});
+
 test('reduced motion stops the twinkle and the star', async ({ page }) => {
   const running = () =>
     page.evaluate(() => [...document.querySelectorAll('.hero :is(.bulb, .tree .ornament, .tree .star)')].reduce((n, el) => n + el.getAnimations().length, 0));

@@ -44,7 +44,11 @@ const rows = Array.from({ length: loops }, (_, l) =>
 <!-- From desktop width the lights cross the bright photo; a soft shade under them keeps their glow. -->
 <div data-holiday aria-hidden="true" class="pointer-events-none absolute top-0 right-0 z-[1] hidden h-10 w-[44%] bg-gradient-to-b from-night/60 to-transparent lg:block"></div>
 <canvas data-holiday data-snow aria-hidden="true" class="pointer-events-none absolute inset-0 z-[1] size-full"></canvas>
-<div data-holiday aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 z-[5] flex h-10 justify-center overflow-hidden">
+<!--
+  The row is far wider than the window; strict containment keeps Chrome from counting that width
+  when it prints, where it would otherwise shrink the whole page to fit.
+-->
+<div data-holiday aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 z-[5] flex h-10 justify-center overflow-hidden [contain:strict]">
   {
     rows.map((bulbs) => (
       <div class="relative h-10 flex-none" style={{ width: `${loop.width}px` }}>
