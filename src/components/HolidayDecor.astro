@@ -4,11 +4,13 @@
  * snowbank leading into the page. Place it first in the hero, a positioned dark band; the
  * hero's copy needs `relative z-[2]` to stay above the snow. HolidayTree goes in the photo.
  */
-// Cranberry, gold, pine and ice, repeating along the string.
-const colors = ['oklch(0.64 0.21 25)', 'oklch(0.88 0.15 88)', 'oklch(0.72 0.17 150)', 'oklch(0.74 0.12 235)'];
+import { season } from '../lib/season-colors';
+
+// Red, gold, green and blue (shared with the tree), repeating along the string.
+const colors = [season.red, season.gold, season.green, season.blue];
 // Each loop is a quadratic curve from (-4, 1) through the control point (width / 2, 1 + pull)
 // to (width + 4, 1); it sags half the pull.
-const loop = { width: 160, pull: 30 };
+const loop = { width: 160, pull: 22 };
 // Enough loops for a 2560 px window; the row is centred and clipped.
 const loops = 16;
 const along = [0.15, 0.38, 0.62, 0.85];
@@ -42,6 +44,8 @@ const rows = Array.from({ length: loops }, (_, l) =>
     if (override ? override === 'christmas' : inSeason) document.documentElement.dataset.season = 'christmas';
   }
 </script>
+<!-- From desktop width the lights cross the bright photo; a soft shade under them keeps their glow. -->
+<div data-holiday aria-hidden="true" class="pointer-events-none absolute top-0 right-0 z-[1] hidden h-9 w-[44%] bg-gradient-to-b from-night/45 to-transparent lg:block"></div>
 <canvas data-holiday data-snow aria-hidden="true" class="pointer-events-none absolute inset-0 z-[1] size-full"></canvas>
 <div data-holiday aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 z-[5] flex h-10 justify-center overflow-hidden">
   {
@@ -57,10 +61,16 @@ const rows = Array.from({ length: loops }, (_, l) =>
     ))
   }
 </div>
-<!-- The snowbank runs into the white band below the hero. -->
-<svg data-holiday aria-hidden="true" viewBox="0 0 1280 64" preserveAspectRatio="none" class="pointer-events-none absolute inset-x-0 -bottom-px z-[3] h-8 w-full lg:h-16">
-  <path d="M0 30 C 90 14, 180 16, 270 28 C 360 40, 450 42, 560 26 C 650 14, 720 10, 800 22 C 900 36, 1000 40, 1100 26 C 1170 16, 1230 14, 1280 20 L 1280 64 L 0 64 Z" fill="var(--color-line)" />
-  <path d="M0 36 C 90 22, 180 24, 270 35 C 360 46, 450 48, 560 33 C 650 21, 720 18, 800 29 C 900 42, 1000 46, 1100 33 C 1170 24, 1230 22, 1280 27 L 1280 64 L 0 64 Z" fill="var(--color-paper)" />
+<!--
+  The snowbank runs into the white band below the hero: low under the copy, heaped into a drift
+  at 56%, where the photo's gold edge meets it and HolidayTree stands, with a smaller drift in
+  front on the right. Layers overlap so it has body, not a wavy divider's single edge.
+-->
+<svg data-holiday aria-hidden="true" viewBox="0 0 1280 80" preserveAspectRatio="none" class="pointer-events-none absolute inset-x-0 -bottom-px z-[3] h-8 w-full lg:h-20">
+  <path d="M0 61 C 200 55, 420 57, 560 49 C 640 41, 690 25, 740 23 C 800 21, 860 35, 940 45 C 1060 55, 1180 53, 1280 49 L 1280 80 L 0 80 Z" fill="var(--color-line)" />
+  <path d="M0 65 C 200 59, 420 61, 560 54 C 640 46, 690 30, 740 28.5 C 800 27, 860 40, 940 50 C 1060 59, 1180 57, 1280 54 L 1280 80 L 0 80 Z" fill="var(--color-paper)" />
+  <path d="M940 80 C 990 66, 1090 60, 1180 66 C 1225 69, 1255 74, 1280 76 L 1280 80 Z" fill="var(--color-line)" />
+  <path d="M948 80 C 996 69, 1092 63.5, 1180 69.5 C 1224 72.5, 1254 77, 1280 79 L 1280 80 Z" fill="var(--color-paper)" />
 </svg>
 
 <script>

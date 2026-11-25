@@ -1,50 +1,59 @@
 ---
+import { season } from '../lib/season-colors';
+
 /**
  * A small decorated tree for the home hero's Christmas season, shown only in season (see
- * HolidayDecor). On phones its snow mound rests on the gold line at the photo's foot; from
- * desktop width it straddles the line at the photo's left edge, on the snowbank, a little off
- * centre so the line passes behind a branch instead of running into the star. Place it in the
- * photo box. No glow: the owner asked for the tree without a halo.
+ * HolidayDecor). On phones it stands on its own snow mound on the gold line, over the desk at the
+ * photo's lower left, clear of the people. From desktop width it stands in the snowbank's drift
+ * where the photo's gold edge meets it, a little off centre so the line passes behind a branch
+ * instead of running into the star. Place it in the photo box. No glow: the owner asked for the
+ * tree without a halo.
  *
- * Drawn to look made, not stamped: uneven drooping tiers, a darker back and a lighter, lit right
- * side, snow caught on a few branch tips, and baubles in the string lights' colours.
+ * Drawn to look made, not stamped: uneven drooping tiers, a deep back and a lit right side,
+ * snow caps that follow a few branch tips, and baubles mostly in gold with the lights' red and blue.
  */
 const baubles = [
-  { x: 27, y: 20, r: 1.7, fill: '#e0525a' },
-  { x: 33.5, y: 27.5, r: 1.8, fill: '#d2bb5b' },
-  { x: 24, y: 35.5, r: 1.9, fill: '#7fb6e6' },
-  { x: 37.5, y: 38.5, r: 2, fill: '#e0525a' },
-  { x: 29.5, y: 45, r: 2, fill: '#d2bb5b' },
-  { x: 19.5, y: 50.5, r: 2.1, fill: '#e0525a' },
-  { x: 42, y: 51, r: 2.1, fill: '#7fb6e6' },
-  { x: 33, y: 56.5, r: 2.2, fill: '#e0525a' },
-  { x: 14.5, y: 58.5, r: 2.2, fill: '#d2bb5b' },
-  { x: 46.5, y: 58.8, r: 2.1, fill: '#d2bb5b' },
+  { x: 27, y: 20, r: 1.7, fill: season.red },
+  { x: 33.5, y: 27.5, r: 1.8, fill: season.gold },
+  { x: 24, y: 35.5, r: 1.9, fill: season.gold },
+  { x: 37.5, y: 38.5, r: 2, fill: season.blue },
+  { x: 29.5, y: 45, r: 2, fill: season.gold },
+  { x: 19.5, y: 50.5, r: 2.1, fill: season.red },
+  { x: 42, y: 51, r: 2.1, fill: season.gold },
+  { x: 33, y: 56.5, r: 2.2, fill: season.gold },
+  { x: 14.5, y: 58.5, r: 2.2, fill: season.blue },
+  { x: 46.5, y: 58.8, r: 2.1, fill: season.red },
 ].map((b, i) => ({ ...b, delay: `${((i * 0.83) % 2.4).toFixed(2)}s` }));
+// Snow lying on a branch tip: a sliver that follows the tip's slope, thicker on its upper side.
+const caps = [
+  'M34.9 22.9 Q36.2 21.3 38.1 22.1 Q36.8 22.2 35.6 23.3 Z',
+  'M19.2 31.4 Q20.4 30.2 22.6 31.9 Q21 31.4 19.8 31.9 Z',
+  'M41.6 42.2 Q43.4 40.4 45.9 41.1 Q44 41.3 42.4 42.6 Z',
+  'M10.8 51.4 Q12.6 50 15.2 51.9 Q13.2 51.4 11.4 51.9 Z',
+  'M45.4 52.3 Q47.5 50.6 50.3 51.3 Q48.2 51.5 46.2 52.7 Z',
+  'M50.6 60.3 Q52.5 58.7 54.6 60.4 Q52.7 60 51.2 60.8 Z',
+];
 ---
 
-<div data-holiday aria-hidden="true" class="tree pointer-events-none absolute right-3.5 bottom-[3px] z-[4] h-[91px] w-[76px] lg:right-auto lg:bottom-6 lg:left-0 lg:h-[144px] lg:w-[120px] lg:-translate-x-1/3 xl:h-[163px] xl:w-[136px]">
+<div data-holiday aria-hidden="true" class="tree pointer-events-none absolute bottom-[3px] left-4 z-[4] h-[91px] w-[76px] lg:bottom-[38px] lg:left-0 lg:h-[144px] lg:w-[120px] lg:-translate-x-1/3 xl:h-[163px] xl:w-[136px]">
   <svg viewBox="0 0 60 72" class="block size-full overflow-visible">
-    <!-- Ground: a warm shadow (the snowbank's rim colour) under a snow mound. -->
-    <ellipse cx="30" cy="68.6" rx="22" ry="3.4" fill="var(--color-line)" opacity="0.7" />
-    <ellipse cx="30" cy="67.6" rx="19.5" ry="3" fill="#f4f7fb" />
-    <rect x="27.6" y="60.5" width="4.8" height="7" rx="0.8" fill="#5a3d26" />
+    <!-- Phones: its own mound in the snowbank's white and crest. Desktop: it stands in the bank. -->
+    <g class="lg:hidden">
+      <path d="M9 70.6 Q30 63.4 51 70.6 Z" fill="var(--color-paper)" />
+      <path d="M9 70.6 Q30 63.4 51 70.6" fill="none" stroke="var(--color-line)" stroke-width="0.9" />
+    </g>
+    <rect x="27.6" y="60.5" width="4.8" height="7.5" rx="0.8" fill="#4f3522" />
     <!-- The back silhouette: tiers with drooping tips, the right side reaching a little further. -->
     <path
       d="M30 6 L34.2 14 L32.4 14.6 L37.8 22.2 L35.1 23 L41.4 31.2 L38.2 32.2 L45.6 41.2 L41.8 42.3 L50 51.4 L45.6 52.4 L54.2 60.6 Q31 64.6 6.4 60.4 L14.6 52.2 L11 51.2 L19 42.2 L15.6 41.3 L22.2 32.2 L19.4 31.3 L25.2 23 L22.6 22.3 L27.6 14.6 L25.9 14 Z"
-      fill="#1d4d35"
+      fill="#173f2b"
     />
-    <!-- The lit right side, a lighter green. -->
+    <!-- The lit right side. -->
     <path
       d="M30 8.5 L33.2 14.6 L31.6 15.2 L36.4 22.4 L34.2 23.2 L39.8 31.4 L37 32.4 L43.8 41.4 L40.6 42.4 L48 51.4 L44.4 52.4 L51.6 60 Q41 62 30 62.4 Z"
-      fill="#2e7550"
+      fill="#256646"
     />
-    <!-- Snow caught on a few tips, unevenly. -->
-    <ellipse cx="36.6" cy="22.4" rx="2.1" ry="0.8" fill="#f4f7fb" />
-    <ellipse cx="20.6" cy="31.5" rx="1.9" ry="0.75" fill="#f4f7fb" />
-    <ellipse cx="44" cy="41.4" rx="2.3" ry="0.85" fill="#f4f7fb" />
-    <ellipse cx="13" cy="51.6" rx="2.2" ry="0.8" fill="#f4f7fb" />
-    <ellipse cx="51.8" cy="60.2" rx="2.4" ry="0.85" fill="#f4f7fb" />
+    {caps.map((d) => <path d={d} fill="#f4f6f8" />)}
     {
       baubles.map((b) => (
         <g class="ornament" style={{ animationDelay: b.delay }}>
@@ -53,7 +62,7 @@ const baubles = [
         </g>
       ))
     }
-    <polygon class="star" points="30,0.4 31.06,3.54 34.37,3.58 31.71,5.56 32.7,8.72 30,6.8 27.3,8.72 28.29,5.56 25.63,3.58 28.94,3.54" fill="#d2bb5b" />
+    <polygon class="star" points="30,0.4 31.06,3.54 34.37,3.58 31.71,5.56 32.7,8.72 30,6.8 27.3,8.72 28.29,5.56 25.63,3.58 28.94,3.54" fill={season.gold} />
   </svg>
 </div>
 
