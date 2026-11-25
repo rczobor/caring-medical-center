@@ -8,7 +8,7 @@
  * `[data-snow-quiet]` copy fade to a third, so none sits on a letter like an accent mark.
  *
  * It costs battery, so it runs only while the hero is on screen and the tab is visible. With
- * reduced motion it draws one still frame.
+ * reduced motion, at load or turned on mid-visit, it draws one still frame.
  */
 
 interface Layer {
@@ -137,7 +137,7 @@ export function startSnow(canvas: HTMLCanvasElement) {
   // Typed again so the narrowing holds inside the hoisted functions below.
   const ctx: CanvasRenderingContext2D = context;
   const scene: HTMLElement = parent;
-  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const sprites = new Map(LAYERS.map((L) => [L, Array.from({ length: VARIANTS }, () => makeSprite(L.kind))]));
 
   let width = 0;
@@ -210,7 +210,7 @@ export function startSnow(canvas: HTMLCanvasElement) {
     height = h;
     if (changed || !flakes.length) populate();
     measure();
-    if (still) draw(performance.now());
+    if (motion.matches) draw(performance.now());
   }
 
   function windAt(t: number) {
@@ -271,6 +271,7 @@ export function startSnow(canvas: HTMLCanvasElement) {
 
   function draw(now: number) {
     const t = now / 1000;
+    const still = motion.matches;
     const ramp = still ? 1 : clamp((t - rampStart) / 2.5, 0, 1);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -289,11 +290,12 @@ export function startSnow(canvas: HTMLCanvasElement) {
     }
 
     for (const f of flakes) {
-      const x = f.x + f.fa * Math.sin(TAU * f.ff * t + f.fp);
+      // Still, a flake keeps its place, so a redraw after a resize shows the same picture.
+      const x = still ? f.x : f.x + f.fa * Math.sin(TAU * f.ff * t + f.fp);
       const d = f.r * 4;
       if (f.layer.tumble) {
-        // Tumbling clumps foreshorten as they turn.
-        const sy = 0.5 + 0.5 * Math.abs(Math.cos(t * f.ts + f.tp));
+        // Tumbling clumps foreshorten as they turn; still, each keeps the turn it started with.
+        const sy = 0.5 + 0.5 * Math.abs(Math.cos((still ? 0 : t * f.ts) + f.tp));
         const c = Math.cos(f.rot) * scale;
         const n = Math.sin(f.rot) * scale;
         ctx.setTransform(c, n, -n * sy, c * sy, x * scale, f.y * scale);
@@ -314,12 +316,14 @@ export function startSnow(canvas: HTMLCanvasElement) {
     if (frames++ % 30 === 0) measure();
     step(now, now / 1000, dt);
     draw(now);
-    raf = requestAnimationFrame(tick);
+    // Not left to the `change` listener below: while every frame reads `matches`, Chrome does
+    // not send that event when the visitor turns reduced motion on.
+    if (!motion.matches) raf = requestAnimationFrame(tick);
   }
 
   function run() {
     cancelAnimationFrame(raf);
-    if (still || !onScreen || document.hidden) return;
+    if (motion.matches || !onScreen || document.hidden) return;
     last = performance.now();
     raf = requestAnimationFrame(tick);
   }
@@ -343,6 +347,10 @@ export function startSnow(canvas: HTMLCanvasElement) {
     run();
   }).observe(scene);
   document.addEventListener('visibilitychange', run);
+  motion.addEventListener('change', () => {
+    if (motion.matches) draw(performance.now());
+    run();
+  });
   rampStart = performance.now() / 1000;
   resize();
   run();

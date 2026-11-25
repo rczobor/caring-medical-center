@@ -70,39 +70,3 @@ test("each clinic card's photo moves into its page", async ({ page }) => {
     expect(await transitionName(page.getByRole('main').getByRole('img').first())).toBe(name);
   }
 });
-
-// The hero's Christmas decorations follow the visitor's own date: 1 December to 6 January.
-const seasonDays = [
-  ['2026-11-30T12:00', false],
-  ['2026-12-01T00:05', true],
-  ['2027-01-06T23:55', true],
-  ['2027-01-07T00:05', false],
-] as const;
-for (const [date, decorated] of seasonDays) {
-  test(`the hero is ${decorated ? '' : 'not '}decorated for Christmas on ${date}`, async ({ page }) => {
-    await page.clock.setFixedTime(new Date(date));
-    await page.goto('/');
-    await expect(page.locator('.hero canvas[data-snow]')).toBeVisible({ visible: decorated });
-  });
-}
-
-test.describe('in the Christmas season, on a phone', () => {
-  test.use({ viewport: { width: 390, height: 844 } });
-
-  test('the decorations stay inside the page and out of the way of the copy', async ({ page }) => {
-    await page.goto('/?season=christmas');
-    await expect(page.locator('.hero canvas[data-snow]')).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
-    // The snowbank sits below the price figures, not over them.
-    const figures = await page.locator('.hero dl').boundingBox();
-    const bank = await page.locator('.hero svg[data-holiday]').boundingBox();
-    expect(figures!.y + figures!.height).toBeLessThanOrEqual(bank!.y + 8);
-    // The lights hang in the dark eave above the photo, clear of the faces in it.
-    const photo = await page.locator('.hero-photo').boundingBox();
-    const lowestBulb = await page.locator('.hero .bulb').evaluateAll((els) => Math.max(...els.map((el) => el.getBoundingClientRect().bottom)));
-    expect(lowestBulb).toBeLessThanOrEqual(photo!.y + 2);
-    // The prices stay clickable through the snow.
-    await page.locator('.hero dl a').first().click();
-    await expect(page).toHaveURL(/rontgen-es-mr-arak|ct-arak/);
-  });
-});

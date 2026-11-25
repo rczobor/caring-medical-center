@@ -4,7 +4,11 @@
  * snowbank leading into the page. Place it first in the hero, a positioned dark band; the
  * hero's copy needs `relative z-[2]` to stay above the snow. HolidayTree goes in the photo.
  */
+import { isChristmas } from '../lib/season';
 import { season } from '../lib/season-colors';
+
+// Sets the season on <html> by the date in Budapest; `?season=christmas|off` overrides it.
+const check = `if(!matchMedia('(forced-colors:active)').matches&&(${isChristmas})(new Date(),new URLSearchParams(location.search).get('season')))document.documentElement.dataset.season='christmas'`;
 
 // Red, gold, green and blue (shared with the tree), repeating along the string.
 const colors = [season.red, season.gold, season.green, season.blue];
@@ -31,19 +35,12 @@ const rows = Array.from({ length: loops }, (_, l) =>
 );
 ---
 
-<!--
-  The season, by the visitor's own date: 1 December to 6 January (Epiphany). It runs before
-  the hero paints, so nothing pops in. `?season=christmas` or `?season=off` overrides it, for
-  previews before December and for tests.
--->
-<script is:inline>
-  {
-    const override = new URLSearchParams(location.search).get('season');
-    const today = new Date();
-    const inSeason = today.getMonth() === 11 || (today.getMonth() === 0 && today.getDate() <= 6);
-    if (override ? override === 'christmas' : inSeason) document.documentElement.dataset.season = 'christmas';
-  }
-</script>
+{/*
+  Inline and ahead of the hero's content, so it runs before the hero paints and nothing pops in.
+  A high-contrast (forced colours) mode would repaint the decorations into bright bands and black
+  dots, so there the page stays plain, even with `?season=christmas`.
+*/}
+<script is:inline set:html={check} />
 <!-- From desktop width the lights cross the bright photo; a soft shade under them keeps their glow. -->
 <div data-holiday aria-hidden="true" class="pointer-events-none absolute top-0 right-0 z-[1] hidden h-10 w-[44%] bg-gradient-to-b from-night/60 to-transparent lg:block"></div>
 <canvas data-holiday data-snow aria-hidden="true" class="pointer-events-none absolute inset-0 z-[1] size-full"></canvas>
