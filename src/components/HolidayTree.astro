@@ -1,0 +1,60 @@
+---
+/**
+ * A small decorated tree for the home hero's Christmas season, shown only in season (see
+ * HolidayDecor). On phones it stands on the gold line at the photo's foot; from desktop width
+ * it straddles the line at the photo's left edge, on the snowbank. Place it in the photo box.
+ * No glow: the owner asked for the tree without a halo.
+ */
+---
+
+<div data-holiday aria-hidden="true" class="tree pointer-events-none absolute right-3.5 -bottom-1 z-[4] h-[91px] w-[76px] lg:right-auto lg:bottom-6 lg:left-0 lg:h-[144px] lg:w-[120px] lg:-translate-x-1/2 xl:h-[163px] xl:w-[136px]">
+  <svg viewBox="0 0 60 72" class="block size-full overflow-visible">
+    <ellipse cx="30" cy="67" rx="24" ry="4.5" fill="#f4f7fb" />
+    <rect x="26.5" y="56" width="7" height="10" rx="1" fill="#6b4a2e" />
+    <path d="M30 28 L55 56 Q30 62 5 56 Z" fill="#1f5a3c" />
+    <path d="M6 56 Q 30 62 54 56 L 52 54.5 Q 47 57 43 55.5 Q 38 58.5 33 56.8 Q 28 59 23 56.8 Q 18 58.5 13 55.5 Q 9 57 8 54.5 Z" fill="#f4f7fb" />
+    <path d="M30 17 L48 40 Q30 45 12 40 Z" fill="#26704a" />
+    <path d="M13 40 Q 30 45 47 40 L 45.5 38.6 Q 41 41 37.5 39.8 Q 33.5 42.5 30 41.6 Q 26.5 42.5 22.5 39.8 Q 19 41 14.5 38.6 Z" fill="#f4f7fb" />
+    <path d="M30 8 L42 26 Q30 30 18 26 Z" fill="#2f8556" />
+    <path d="M19 26 Q 30 30 41 26 L 39.6 24.6 Q 36 27 33 26 Q 30 28 27 26 Q 24 27 20.4 24.6 Z" fill="#f4f7fb" />
+    <circle class="ornament" cx="25" cy="21" r="2" fill="#e0525a" style="animation-delay: 0s" />
+    <circle class="ornament" cx="34" cy="22.5" r="2" fill="#e8c95c" style="animation-delay: 0.9s" />
+    <circle class="ornament" cx="19" cy="35" r="2" fill="#7fb6e6" style="animation-delay: 1.6s" />
+    <circle class="ornament" cx="29" cy="33" r="2" fill="#e0525a" style="animation-delay: 0.4s" />
+    <circle class="ornament" cx="40" cy="34.5" r="2" fill="#e8c95c" style="animation-delay: 2.1s" />
+    <circle class="ornament" cx="14" cy="50" r="2.2" fill="#e8c95c" style="animation-delay: 1.2s" />
+    <circle class="ornament" cx="24" cy="47" r="2.2" fill="#7fb6e6" style="animation-delay: 0.2s" />
+    <circle class="ornament" cx="35" cy="49.5" r="2.2" fill="#e0525a" style="animation-delay: 1.9s" />
+    <circle class="ornament" cx="45" cy="50" r="2.2" fill="#7fb6e6" style="animation-delay: 0.7s" />
+    <polygon class="star" points="30,1 31.53,4.9 35.71,5.15 32.47,7.8 33.53,11.85 30,9.6 26.47,11.85 27.53,7.8 24.29,5.15 28.47,4.9" fill="#e8c95c" />
+  </svg>
+</div>
+
+<style>
+  .ornament {
+    animation: twinkle 2.4s ease-in-out infinite;
+  }
+  .star {
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    55% {
+      opacity: 0.4;
+    }
+  }
+  @keyframes pulse {
+    50% {
+      opacity: 0.7;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ornament,
+    .star {
+      animation: none;
+    }
+  }
+</style>

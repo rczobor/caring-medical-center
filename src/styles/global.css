@@ -291,3 +291,11 @@
     scale: 1 0;
   }
 }
+
+/*
+ * Seasonal decorations (HolidayDecor, HolidayTree) show only while <html> carries their season,
+ * which an inline script sets before the page paints.
+ */
+:root:not([data-season='christmas']) [data-holiday] {
+  display: none;
+}
