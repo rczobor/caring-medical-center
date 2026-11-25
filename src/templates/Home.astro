@@ -87,7 +87,7 @@ const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-b
   -->
   <section aria-labelledby="fooldal-cim" class="hero relative isolate overflow-hidden bg-night text-cream">
     <HolidayDecor />
-    <div class="relative h-[13.5rem] sm:h-80 lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[44%]">
+    <div class="hero-photo relative h-[13.5rem] sm:h-80 lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[44%]">
       <Photo
         src={heroPhoto}
         alt={t.home.heroAlt}
@@ -612,10 +612,17 @@ const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-b
         linear-gradient(to bottom, color-mix(in srgb, var(--color-night) 30%, transparent) 0%, transparent 18%, transparent 55%, var(--color-night) 100%);
     }
   }
-  /* In the Christmas season the hero's snowbank (HolidayDecor) needs room under the price figures. */
+  /*
+   * In the Christmas season, below desktop width, the photo strip starts under a slim dark eave
+   * where HolidayDecor's lights hang, so no bulb lands on a face in the photo; and the snowbank
+   * needs room under the price figures.
+   */
   @media (max-width: 63.99rem) {
+    :global(:root[data-season='christmas']) .hero-photo {
+      margin-top: 1.875rem;
+    }
     :global(:root[data-season='christmas']) .hero-copy {
-      padding-bottom: 3.5rem;
+      padding-bottom: 2.5rem;
     }
   }
   /* The page's one orchestrated moment: the gold line of light draws along the photo once, on load. */

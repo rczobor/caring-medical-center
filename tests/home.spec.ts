@@ -97,6 +97,10 @@ test.describe('in the Christmas season, on a phone', () => {
     const figures = await page.locator('.hero dl').boundingBox();
     const bank = await page.locator('.hero svg[data-holiday]').boundingBox();
     expect(figures!.y + figures!.height).toBeLessThanOrEqual(bank!.y + 8);
+    // The lights hang in the dark eave above the photo, clear of the faces in it.
+    const photo = await page.locator('.hero-photo').boundingBox();
+    const lowestBulb = await page.locator('.hero .bulb').evaluateAll((els) => Math.max(...els.map((el) => el.getBoundingClientRect().bottom)));
+    expect(lowestBulb).toBeLessThanOrEqual(photo!.y + 2);
     // The prices stay clickable through the snow.
     await page.locator('.hero dl a').first().click();
     await expect(page).toHaveURL(/rontgen-es-mr-arak|ct-arak/);
