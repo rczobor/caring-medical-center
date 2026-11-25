@@ -1,0 +1,250 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import metro from '../assets/clinic-map-metro.svg';
+import map from '../assets/clinic-map.svg';
+import { danubeLng, height, places, project, splitName, width } from '../lib/clinic-map';
+import { localeOf } from '../lib/locale';
+import { badges, lineEnds } from '../lib/transit';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+import MetroRoundel from './MetroRoundel.astro';
+
+interface Props {
+  clinics: CollectionEntry<'clinics'>[];
+}
+const { clinics } = Astro.props;
+const locale = localeOf(Astro.url);
+const t = ui[locale].clinicMap;
+const link = await linker(locale);
+
+const at = (geo: { lat: number; lng: number }) => {
+  const { x, y } = project(geo);
+  return `--x: ${x.toFixed(1)}; --y: ${y.toFixed(1)}`;
+};
+---
+
+<!--
+  Where the clinics are: a drawn map of Budapest (scripts/clinic-map.ts) with a labelled marker
+  per clinic, each linking to its page, the metro lines (a roundel at one end of each) and the
+  motorway to Budaörs. A clinic's own metro stop is named on its panel's close-up instead: at
+  this scale it sits under the marker. The map is cropped to fit the box (3:2 on phones, a 3:1
+  band from md up), so markers are placed in container units against the same crop as the
+  image's object-fit: cover. A clinic added to clinics.yaml gets its marker from `geo`.
+
+  It must sit inside a [data-clinic-group] (the Rendelőink section), where a marker and the
+  clinic's card light up together on hover or focus and "Melyik van hozzám legközelebb?" marks
+  the nearest one.
+-->
+<div
+  class="clinic-map relative aspect-[3/2] overflow-hidden rounded-md border border-line md:aspect-[3/1]"
+  style={`--w: ${width}; --h: ${height}`}
+  data-ui={JSON.stringify(t.script)}
+>
+  <img src={map.src} alt="" width={width} height={height} loading="lazy" decoding="async" class="absolute inset-0 size-full object-cover" />
+  <img src={metro.src} alt="" width={width} height={height} loading="lazy" decoding="async" class="absolute inset-0 size-full object-cover" />
+  {
+    places.map((place) => (
+      <span
+        aria-hidden="true"
+        class:list={[
+          // A white halo keeps the name readable where a road or metro line runs under it.
+          'pin -translate-x-1/2 -translate-y-1/2 text-xs whitespace-nowrap select-none [text-shadow:0_0_2px_#fff,0_0_4px_#fff,0_0_6px_#fff]',
+          place.kind === 'water' ? 'font-semibold text-[#4f6f7c] italic' : 'font-bold tracking-[0.2em] text-ink-muted uppercase',
+          !place.phone && 'max-sm:hidden',
+        ]}
+        style={at(place)}
+      >
+        {t.places[place.name] ?? place.name}
+      </span>
+    ))
+  }
+  {
+    // From tablet width: on a phone the roundels crowd the clinic markers.
+    lineEnds.map((end) => (
+      <span aria-hidden="true" class="pin -translate-x-1/2 -translate-y-1/2 max-sm:hidden" style={at(end)}>
+        <MetroRoundel line={end.line} />
+      </span>
+    ))
+  }
+  {
+    // A road sign in the motorway's own tone, unlike the round metro marks and the boxed
+    // clinic labels. Phones leave it out: there it sits against the Budaörs label.
+    badges.map((badge) => (
+      <span
+        aria-hidden="true"
+        class="pin -translate-x-1/2 -translate-y-1/2 rounded-sm bg-[#e4dabb] px-1.5 text-xs leading-snug font-bold whitespace-nowrap text-ink max-sm:hidden"
+        style={at(badge)}
+      >
+        {badge.label}
+      </span>
+    ))
+  }
+  <span data-you hidden aria-hidden="true" class="pin you grid justify-items-center gap-0.5 text-xs font-bold">
+    {/* A ring, so it can't be taken for a clinic's gold dot or a line's end. */}
+    <span class="size-3.5 shrink-0 rounded-full border-[3px] border-ink bg-paper shadow-[0_0_0_2px_var(--color-paper)]"></span>
+    <span class="rounded-md bg-paper px-1 ring-1 ring-ink/15">{t.you}</span>
+  </span>
+  <ol aria-label={t.list}>
+    {
+      clinics.map(({ id, data: clinic }) => {
+        const { brand, short } = splitName(clinic.name);
+        return (
+          <li
+            class="pin marker"
+            data-clinic={id}
+            data-name={clinic.name}
+            data-page={link(clinic.page)}
+            data-lat={clinic.geo.lat}
+            data-lng={clinic.geo.lng}
+            data-side={clinic.geo.lng < danubeLng ? 'left' : 'right'}
+            style={at(clinic.geo)}
+          >
+            <a href={link(clinic.page)} aria-label={clinic.name} class="group flex items-center gap-1.5">
+              <span class="dot size-4 shrink-0 rounded-full border-2 border-ink bg-gold shadow-[0_0_0_3px_var(--color-paper)]" />
+              {/* The brand on a small line over the part that tells the clinics apart, so labels stay narrow. */}
+              <span class="chip rounded-md bg-paper/95 px-2 py-0.5 text-sm leading-tight font-bold whitespace-nowrap ring-1 ring-ink/15">
+                {/* Under 360px the outer labels would run past the map's edge; the link keeps the full name. */}
+                {brand && <span class="brand block text-xs font-semibold text-ink-muted max-[22.5rem]:hidden">{brand} </span>}
+                <span class="link-bar">{short}</span>
+              </span>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ol>
+  <a href="https://www.openstreetmap.org/copyright" class="absolute right-1 bottom-1 rounded-sm bg-paper/85 px-1 text-[0.6875rem] text-ink-muted hover:underline">© OpenStreetMap</a>
+</div>
+{/* Shown by the script where the browser can locate; it asks only when the visitor presses it. */}
+<div data-finder hidden class="mt-2 grid justify-items-start text-sm">
+  <button type="button" class="inline-flex min-h-11 items-center gap-1.5 font-semibold text-gold-ink">
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="shrink-0">
+      <circle cx="8" cy="8" r="2.5" fill="currentColor" />
+      <path d="M8 1.5v2.5M8 12v2.5M1.5 8H4M12 8h2.5M8 3.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+    <span class="link-bar">{t.nearest}</span>
+  </button>
+  {/* Its line is kept even while empty, so the cards below don't jump when the answer comes. */}
+  <p aria-live="polite" class="min-h-5"></p>
+</div>
+
+<style>
+  .clinic-map {
+    container-type: size;
+  }
+  /*
+   * object-fit: cover scales the map by whichever side needs more and centres it, so a map
+   * point lands at the box centre plus its offset from the map centre, times that scale.
+   */
+  .pin {
+    --scale: max(100cqw / var(--w), 100cqh / var(--h));
+    position: absolute;
+    left: calc(50cqw + (var(--x) - var(--w) / 2) * var(--scale));
+    top: calc(50cqh + (var(--y) - var(--h) / 2) * var(--scale));
+  }
+  /* The dot (1rem) sits on the point; the label hangs beside it, away from the river. */
+  .marker {
+    translate: -0.5rem -50%;
+    z-index: 1;
+  }
+  .marker[data-side='left'] {
+    translate: calc(-100% + 0.5rem) -50%;
+  }
+  .marker[data-side='left'] a {
+    flex-direction: row-reverse;
+  }
+  /* The visitor's ring sits on their point, "Ön" under it: clinic labels hang to the sides. */
+  .you {
+    translate: -50% -0.4375rem;
+    z-index: 5;
+  }
+  /*
+   * Hover or focus, here or on the clinic's card: a gold ring and a slightly larger dot.
+   * The nearest clinic, which stays: a gold label. No movement.
+   */
+  .marker:is([data-active], [data-nearest]) {
+    z-index: 10;
+  }
+  .marker:is([data-active], [data-nearest]) .dot {
+    scale: 1.25;
+  }
+  .marker[data-active] .chip {
+    box-shadow: 0 0 0 2px var(--color-gold);
+  }
+  .marker[data-nearest] .chip {
+    background: var(--color-gold);
+  }
+  .marker[data-nearest] .brand {
+    color: var(--color-ink);
+  }
+</style>
+
+<script>
+  import { height, metres, project, width } from '../lib/clinic-map';
+
+  for (const map of document.querySelectorAll<HTMLElement>('.clinic-map')) {
+    // The marker and its card light up together: the group is the section holding both.
+    const group = map.closest<HTMLElement>('[data-clinic-group]')!;
+    // The page's language: the template sets the words on the map.
+    const words: Record<string, string> = JSON.parse(map.dataset.ui ?? '{}');
+    const mark = (attribute: string, id: string | undefined) => {
+      for (const el of group.querySelectorAll<HTMLElement>('[data-clinic]')) el.toggleAttribute(attribute, el.dataset.clinic === id);
+    };
+    const clinicOf = (event: Event) => (event.target as Element).closest<HTMLElement>('[data-clinic]')?.dataset.clinic;
+    group.addEventListener('pointerover', (event) => mark('data-active', clinicOf(event)));
+    group.addEventListener('pointerleave', () => mark('data-active', undefined));
+    group.addEventListener('focusin', (event) => mark('data-active', clinicOf(event)));
+    group.addEventListener('focusout', () => mark('data-active', undefined));
+
+    // "Which is nearest": the browser's own location, asked for only on the button, used on
+    // the device and kept nowhere. Straight-line distance, and the page says so.
+    const finder = map.nextElementSibling as HTMLElement;
+    const you = map.querySelector<HTMLElement>('[data-you]')!;
+    if (!('geolocation' in navigator)) continue;
+    const button = finder.querySelector('button')!;
+    const result = finder.querySelector('p')!;
+    finder.hidden = false;
+    button.addEventListener('click', () => {
+      result.textContent = words.locating ?? '';
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+          const here = { lat: coords.latitude, lng: coords.longitude };
+          const [nearest] = [...map.querySelectorAll<HTMLElement>('.marker')]
+            .map((el) => ({ el, d: metres(here, { lat: Number(el.dataset.lat), lng: Number(el.dataset.lng) }) }))
+            .sort((a, b) => a.d - b.d) as [{ el: HTMLElement; d: number }];
+          const { clinic, name, page } = nearest.el.dataset;
+          mark('data-nearest', clinic);
+
+          // The card says it too, with a tag of its own beside the title (hover never shows
+          // one), on the title's line so the card's text keeps its place in the row.
+          for (const tag of group.querySelectorAll('[data-nearest-tag]')) tag.remove();
+          const card = group.querySelector(`[data-clinic="${clinic}"]:not(.marker)`);
+          const tag = Object.assign(document.createElement('span'), { textContent: words.tag ?? '' });
+          tag.dataset.nearestTag = '';
+          // The answer above already says it; inside the title it would rename the card's region.
+          tag.ariaHidden = 'true';
+          tag.className = 'ml-2 inline-block rounded-md bg-gold px-2 align-[0.125em] text-xs leading-5 font-bold whitespace-nowrap text-ink';
+          card?.querySelector('h3')?.append(tag);
+
+          // The answer links to the clinic's booking and details. "kb. 2,1 km" never wraps.
+          const km = nearest.d / 1000;
+          const figure = km.toLocaleString(document.documentElement.lang, { maximumFractionDigits: km < 10 ? 1 : 0 });
+          const distance = km < 1 ? words.within1km : `${words.about}${figure} km`;
+          const link = Object.assign(document.createElement('a'), { href: `${page}#foglalas`, textContent: name, className: 'font-semibold underline underline-offset-4' });
+          result.replaceChildren(words.answer ?? '', link, ` (${words.crowFlies} ${distance}).`);
+
+          // The visitor's ring, when they are inside the drawn area.
+          const { x, y } = project(here);
+          you.hidden = !(x >= 0 && y >= 0 && x <= width && y <= height);
+          you.style.setProperty('--x', x.toFixed(1));
+          you.style.setProperty('--y', y.toFixed(1));
+        },
+        ({ code }) => {
+          result.textContent =
+            (code === GeolocationPositionError.PERMISSION_DENIED ? words.denied : words.failed) ?? '';
+        },
+        { maximumAge: 600_000, timeout: 15_000 },
+      );
+    });
+  }
+</script>

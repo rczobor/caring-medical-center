@@ -1,0 +1,60 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image, getImage } from 'astro:assets';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  widths: number[];
+  sizes: string;
+  class?: string;
+  style?: string;
+  loading?: 'eager' | 'lazy';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  /**
+   * Below `below` px (a layout breakpoint, at the default text size) the photo fills a box
+   * wider than the photo itself (object-fit: cover), so those screens get a copy cut to the
+   * box: what they see stays the same, at a fraction of the bytes. `aspect` is the box's
+   * narrowest width/height there, on a screen at least 320 px wide; `position` is its
+   * object-position, and `sizes` its width.
+   */
+  crop: { below: number; aspect: number; position: string; sizes: string };
+}
+
+const { crop, ...image } = Astro.props;
+const { src, widths } = image;
+// Only a photo taller than the box has anything to cut. A wider one keeps its sides, which
+// wider phones show.
+const phone =
+  src.width / src.height < crop.aspect
+    ? await getImage({
+        src,
+        widths,
+        width: src.width,
+        height: Math.round(src.width / crop.aspect),
+        fit: 'cover',
+        position: crop.position,
+      })
+    : undefined;
+// In em, like the layout's own breakpoints (Tailwind's are rem), so both follow page zoom and
+// the visitor's text size. From 20em (320 px at the default size) up: an aspect measured on a
+// 320 px phone holds only there; a zoomed or larger-text phone is narrower and gets the whole photo.
+const media = `(min-width: 20em) and (max-width: ${crop.below / 16 - 0.001}em)`;
+---
+
+{
+  phone ? (
+    <picture>
+      <source
+        media={media}
+        srcset={phone.srcSet.attribute}
+        sizes={crop.sizes}
+        width={phone.attributes.width}
+        height={phone.attributes.height}
+      />
+      <Image {...image} />
+    </picture>
+  ) : (
+    <Image {...image} />
+  )
+}

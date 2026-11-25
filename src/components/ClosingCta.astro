@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import waitingRoom from '../assets/waiting-room.jpg';
+import { formatPhone } from '../lib/format';
+import { localeOf } from '../lib/locale';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+// The live site's closing band, shared by 95 pages, with its copy verbatim. Every page ends with it, so the way
+// to book is always one step away at the end of a page.
+// The photo is the live one with its baked-in dark text overlay lifted (brightness
+// x1.4 in sharp): no text sits on it here.
+// "Várjuk hívását!" asks for a call, so each clinic's number sits under the booking button.
+// "Időpontfoglalás" leads where it does everywhere on the page: to the page's booking
+// panel (#foglalas) when it has one, otherwise to the contact page. The phone booking bar
+// steps aside while this band is on screen ([data-booking-cta]).
+interface Props {
+  href?: string;
+  /** On a clinic's own page its row comes first, so a patient there calls that clinic, not the first listed. */
+  first?: string | undefined;
+}
+const locale = localeOf(Astro.url);
+const t = ui[locale];
+const { href = (await linker(locale))('/kapcsolat'), first } = Astro.props;
+const clinics = (await getCollection('clinics')).sort((a, b) => Number(b.id === first) - Number(a.id === first) || a.data.position - b.data.position);
+---
+
+<section aria-labelledby="zaro-foglalas" data-pagefind-ignore class="bg-night text-cream">
+  <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-12 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16 lg:py-20">
+    <div>
+      <p class="font-display font-semibold text-gold">{t.closingCta.eyebrow}</p>
+      <h2 id="zaro-foglalas" class="mt-2 text-3xl leading-tight font-semibold text-balance sm:text-4xl">{t.closingCta.title}</h2>
+      <a
+        href={href}
+        data-booking-cta
+        class="mt-6 inline-flex h-11 items-center rounded-full bg-gold px-6 font-bold text-ink hover:brightness-105"
+      >
+        {t.book}
+      </a>
+      <ul class="mt-6 grid max-w-sm divide-y divide-cream/15 border-y border-cream/15">
+        {
+          clinics.map(({ data }) => (
+            <li class="flex items-center justify-between gap-4 py-2.5">
+              <span class="text-sm font-bold">{data.name}</span>
+              <a
+                href={`tel:${data.phone}`}
+                aria-label={t.call(formatPhone(data.phone), data.name)}
+                class="inline-flex h-11 min-w-[9.5rem] shrink-0 items-center justify-center rounded-full border-[1.5px] border-cream/50 px-4 text-sm font-bold whitespace-nowrap tabular-nums hover:border-cream"
+              >
+                {formatPhone(data.phone)}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <!-- A lit panel, as on home: square, with a gold line where its light meets the band. -->
+    <div class="relative hidden sm:block">
+      <Image
+        src={waitingRoom}
+        alt=""
+        widths={[480, 720, 960]}
+        sizes="(min-width: 1152px) 520px, (min-width: 640px) 45vw, 100vw"
+        class="aspect-[3/2] w-full bg-night-raised object-cover"
+      />
+      <span aria-hidden="true" class="absolute inset-y-0 left-0 w-[3px] bg-gold"></span>
+    </div>
+  </div>
+</section>

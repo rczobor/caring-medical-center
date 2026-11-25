@@ -1,0 +1,113 @@
+title: Caring Medical Center | Fast MRI, CT & X-ray diagnostics – Budapest
+description: Caring Medical Center in Hungary offers fast, accurate and professional diagnosis with modern MRI, CT and X-ray exams, experienced radiologists and online booking.
+heading: Fast, accurate exams with a human touch
+lead: We take care of your health with state-of-the-art equipment and expert doctors.
+image: '@assets/photos/recepcio.jpg'
+helpTitle: How can we help?
+helpIntro: Choose what hurts, and we'll show you which exam, specialist and treatment can help.
+complaints:
+  - name: Does your knee hurt?
+    text: Knee MRI, orthopedics, physiotherapy
+    page: /en/conditions/knee-pain
+  - name: Do you have back, lower back or neck pain?
+    text: Spine MRI, spine care, physiotherapy
+    page: /en/conditions/back-and-neck-pain
+  - name: Does your shoulder hurt?
+    text: Shoulder MRI, orthopedics, shockwave therapy
+    page: /en/conditions/shoulder-pain
+  - name: Does your hand or wrist hurt?
+    text: Wrist MRI, hand surgery, physiotherapy
+    page: /en/conditions/hand-and-wrist-pain
+  - name: Do you have headaches or often feel dizzy?
+    text: Headache center, neurology, head MRI
+    page: /en/conditions/headache-and-dizziness
+  - name: Did you get injured playing sport?
+    text: Traumatologist, urgent MRI, rehabilitation
+    page: /en/conditions/sports-injuries
+shortcuts:
+  - name: Already have a report?
+    text: Radiology second opinion
+    page: /en/medreport
+  - name: Do you need a referral?
+    text: Preparation, reports and payment
+    page: /en/patient-information
+  - name: Our doctors
+    text: Our specialists by specialty
+    page: /en/doctors
+diagnosticsTitle: Diagnostics
+diagnostics:
+  - title: MRI scans
+    text: Most patients come for an MRI scan on a specialist's recommendation, but with us the exam can be requested without a referral, even on weekends. Do you have a question? Feel free to contact us.
+    page: /en/mri
+    prices: mr
+  - title: CT scans
+    text: CT scans at Caring Medical Buda, with online booking.
+    page: /en/ct
+    prices: ct
+  - title: X-ray exams
+    text: The digital X-ray equipment used at Caring Medical Center is a patient-friendly device built on the latest technology, and it puts less strain on your body.
+    page: /en/x-ray
+    prices: rtg
+  - title: Laboratory tests
+    text: Lab tests help map exactly how your body is working, whether for a routine check-up or targeted diagnostics. With us, the most common blood, urine and hormone tests can be done quickly and conveniently, even without a referral. Have a question? Feel free to contact us!
+    page: /en/laboratory-tests
+  - title: Ultrasound
+    text: Ultrasound is a painless, fast and accurate way to examine your internal organs, joints and blood vessels. With our modern equipment you get an immediate picture of your health, even without a referral. Contact us for an appointment!
+    page: /en/ultrasound
+aboutTitle: Rehabilitation, diagnostic and medical center
+aboutText: Our goal is accurate diagnosis and targeted treatment of musculoskeletal conditions for amateur and professional athletes and for private individuals. Using modern examination methods, we uncover the causes of musculoskeletal complaints and analyze load capacity and injury risk. Building on the diagnostic results, we put together personalized physiotherapy and physical therapy programs that support effective recovery, pain relief and the restoration of movement. With our integrated approach, we not only support healing but also contribute to prevention.
+stats:
+  - value: 16+
+    label: Specialist clinics
+    text: With a wide range of coordinated services, we take care of your recovery
+  - value: 20+
+    label: Specialists
+    text: Our specialists provide professional, comprehensive and personalized treatment for our patients
+  - value: 45,000+
+    label: Satisfied patients
+    text: Every year we help hundreds of athletes and private individuals recover
+specialtiesTitle: Specialist clinics
+specialtiesIntro: Our specialist clinics offer a wide range of options so that patients receive high-quality care. At Caring Medical Center, in one place and in a refined setting, our excellent specialists and state-of-the-art equipment open up further paths to recovery.
+specialties:
+  - name: Urgent care
+    page: /en/specialist-clinics/urgent-care
+  - name: Neurosurgery
+    page: /en/specialist-clinics/neurosurgery
+  - name: Traumatology and sports surgery
+    page: /en/specialist-clinics/orthopedics-traumatology-sports-surgery
+  - name: Rheumatology
+    page: /en/specialist-clinics/rheumatology
+  - name: Cardiology and sports cardiology
+    page: /en/specialist-clinics/cardiology
+  - name: Neurology
+    page: /en/specialist-clinics/neurology
+  - name: Hand surgery
+    page: /en/specialist-clinics/hand-surgery
+  - name: Naturopathy
+    page: /en/specialist-clinics/naturopathy-phytotherapy
+rehabLabel: Alternative therapies
+rehabTitle: Rehabilitation and health maintenance
+rehabIntro: We are committed to improving quality of life, and we provide the best service in diagnostics, medical care and rehabilitation.
+rehab:
+  - name: Magnetic therapy
+    page: /en/rehabilitation/magnetic-therapy
+  - name: Kinesiology taping
+    page: /en/rehabilitation/kinesiology-taping
+  - name: Shockwave therapy
+    page: /en/rehabilitation/shockwave-therapy
+  - name: Massage therapy
+    page: /en/rehabilitation/massage-therapy
+  - name: Physiotherapy
+    page: /en/rehabilitation/physiotherapy
+  - name: Laser therapy
+    page: /en/rehabilitation/laser-therapy
+testimonialsTitle: What our patients say
+testimonials:
+  - I'm very happy with the clinic's services. I came here for an MRI scan, and even booking the appointment was quick and smooth
+  - The atmosphere is friendly, and the place is clean and modern with a very pleasant scent 🙂 None of my appointments ever ran late. I recommend it wholeheartedly
+  - Over one month I had 8–10 magnetic therapy sessions and a few laser therapy sessions, and as a result I made a full recovery and my thigh is healthy again
+  - Szekér Zoli has a team of true pros, hats off to every one of them.🫡👏
+  - After 4 weeks I can get through everyday life without pain, and soon I can start training again
+  - I've been to Medical Point several times. They were always quick and helpful. After the exam I received effective treatment.
+  - The lady who did my MRI scan was extremely kind and explained everything thoroughly. Precision, punctuality, kindness
+  - They were extremely quick and helpful with me. I'll always come here for my MRI scans. Both times my report was ready early

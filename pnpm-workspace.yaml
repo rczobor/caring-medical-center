@@ -1,0 +1,5 @@
+overrides:
+  # @napi-rs/wasm-runtime's peer range admits @emnapi/runtime 2.0 betas, which are
+  # incompatible with the @emnapi/core 1.x that @astrojs/astro2tsx bundles, and
+  # crash `astro check`. Remove once @astrojs/check stops resolving the beta.
+  '@emnapi/runtime': 1.11.3

@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../lib/format';
+import { localeOf } from '../lib/locale';
+import { ui } from '../lib/ui';
+
+interface Props {
+  /** The newest other articles, newest first. */
+  articles: (CollectionEntry<'site'> & { date: Date })[];
+}
+const { articles } = Astro.props;
+const locale = localeOf(Astro.url);
+---
+
+<!-- Beside an article on desktop (the page's aside), after it on phones: where to read next. -->
+<section aria-labelledby="tovabbi-hirek" data-pagefind-ignore class="rounded-md border border-ink/20 bg-paper">
+  <h2 id="tovabbi-hirek" class="border-b border-line px-5 pt-5 pb-4 text-xl font-semibold">{ui[locale].news.more}</h2>
+  <ul class="divide-y divide-line">
+    {
+      articles.map(({ id, date, data }) => (
+        <li class="px-5 py-4">
+          <a href={`/${id}`} class="link-bar leading-snug font-bold">
+            {data.heading}
+          </a>
+          <p class="mt-1 text-sm text-ink-muted">
+            <time datetime={date.toISOString().slice(0, 10)}>{formatDate(date, locale)}</time>
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+</section>

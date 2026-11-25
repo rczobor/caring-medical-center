@@ -1,0 +1,14 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import PriceListPage from '../components/PriceListPage.astro';
+import { localeOf, localId } from '../lib/locale';
+import { ui } from '../lib/ui';
+
+const locale = localeOf(Astro.url);
+const t = ui[locale].priceList.rehab;
+const page = await getEntry('pages', localId('rehabilitacio-es-szakrendeles-arak', locale));
+if (!page) throw new Error(`Missing src/content/pages/${localId('rehabilitacio-es-szakrendeles-arak', locale)}.md`);
+const rows = (await getCollection('prices', (p) => p.data.category === 'rehab')).sort((a, b) => a.data.position - b.data.position);
+---
+
+<PriceListPage page={page} breadcrumb={t.crumb} sections={[{ id: 'rehab', title: t.list, rows }]} />

@@ -1,0 +1,109 @@
+---
+import { getEntries, render, type CollectionEntry } from 'astro:content';
+import BookingBar from '../components/BookingBar.astro';
+import BookingPanel from '../components/BookingPanel.astro';
+import DepositNote from '../components/DepositNote.astro';
+import PageHero from '../components/PageHero.astro';
+import PriceLedger from '../components/PriceLedger.astro';
+import ServiceSteps from '../components/ServiceSteps.astro';
+import TopicList from '../components/TopicList.astro';
+import ClosingCta from '../components/ClosingCta.astro';
+import Base from '../layouts/Base.astro';
+import { decisionFacts, examPath, examsOf, resolveBookings, serviceIn } from '../lib/catalog';
+import { describe } from '../lib/describe';
+import { localeOf } from '../lib/locale';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+/** An exam page, e.g. /mrvizsgalat/terdizuleti-mr. Its route files list the exams (examPaths). */
+interface Props {
+  exam: CollectionEntry<'exams'>;
+}
+const { exam } = Astro.props;
+const locale = localeOf(Astro.url);
+const t = ui[locale];
+const link = await linker(locale);
+const service = await serviceIn(exam.data.service.id, locale);
+const rows = (await getEntries(exam.data.prices)).filter((r) => !r.data.extra);
+const bookings = await resolveBookings(service);
+const others = (await examsOf(service, locale)).filter((e) => e.id !== exam.id);
+const { Content } = await render(exam);
+---
+
+<Base
+  bookingPanel
+  image={service.data.image}
+  title={t.exam.title(exam.data.title)}
+  description={describe(exam.body ?? '', t.exam.description(exam.data.title))}
+>
+  <PageHero
+    breadcrumbs={[{ label: t.diagnosticsCrumb, href: link('/diagnosztika') }, { label: service.data.name, href: service.data.path }, { label: exam.data.title }]}
+    title={exam.data.title}
+    facts={decisionFacts(service, rows, locale)}
+    image={{ src: service.data.image, alt: service.data.imageAlt }}
+  />
+
+  <div class="mx-auto grid max-w-6xl gap-14 px-4 pt-12 pb-16 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-16 lg:pb-20">
+    <aside class="order-3 lg:sticky lg:top-6 lg:order-none lg:col-start-2 lg:row-span-5 lg:row-start-1 lg:max-h-[calc(100dvh-3rem)] lg:self-start lg:overflow-y-auto">
+      <BookingPanel bookings={bookings} />
+    </aside>
+
+    <section aria-labelledby="rola" class="order-1 lg:col-start-1">
+      <h2 id="rola" class="text-2xl font-semibold">{t.exam.about}</h2>
+      <div class="copy mt-4"><Content /></div>
+    </section>
+
+    <section aria-labelledby="arak" class="order-2 lg:col-start-1">
+      <h2 id="arak" class="text-2xl font-semibold">{t.exam.prices}</h2>
+      {
+        rows.length ? (
+          <div class="mt-5">
+            <PriceLedger rows={rows} />
+          </div>
+        ) : (
+          <p class="mt-4 text-ink-muted">{t.exam.noPrice}</p>
+        )
+      }
+      <div class="mt-5 grid gap-2 text-sm text-ink-muted">
+        {service.data.contrastNote && <p class="max-w-[36rem]">{service.data.contrastNote}</p>}
+        <p>
+          {t.exam.fullList.before}<a href={link('/rontgen-es-mr-arak')} class="underline underline-offset-4">{t.exam.fullList.link}</a>{t.exam.fullList.after}
+        </p>
+      </div>
+      {
+        service.data.deposit && (
+          <div class="mt-6">
+            <DepositNote />
+          </div>
+        )
+      }
+    </section>
+
+    <section aria-labelledby="menet" class="order-4 lg:col-start-1">
+      <ServiceSteps service={service} />
+    </section>
+
+    <section aria-labelledby="tudnivalok" class="order-5 lg:col-start-1">
+      <h2 id="tudnivalok" class="text-2xl font-semibold">{service.data.precautionsTitle}</h2>
+      <TopicList items={service.data.precautions} />
+    </section>
+
+    <nav aria-labelledby="tovabbi" class="order-6 lg:col-start-1">
+      <h2 id="tovabbi" class="text-2xl font-semibold">{t.exam.others}</h2>
+      <ul class="mt-5 columns-2 gap-x-8 sm:columns-3">
+        {
+          others.map((o) => (
+            <li class="break-inside-avoid py-1.5">
+              <a href={examPath(service, o)} class="link-bar">
+                {o.data.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+
+  <ClosingCta href="#foglalas" />
+  <BookingBar />
+</Base>

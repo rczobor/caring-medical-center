@@ -1,0 +1,76 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { directionsUrl, formatHours, formatPhone } from '../lib/format';
+import { localeOf } from '../lib/locale';
+import { ui } from '../lib/ui';
+import { stopFor } from '../lib/transit';
+import MetroRoundel from './MetroRoundel.astro';
+import StreetMap from './StreetMap.astro';
+
+interface Props {
+  clinic: CollectionEntry<'clinics'>['data'];
+  /** What the clinic books online, each with its booking system's page. */
+  bookings: { service: CollectionEntry<'bookingServices'>['data']; url: string }[];
+}
+const { clinic, bookings } = Astro.props;
+const phones = [clinic.phone, clinic.otherPhone].filter((p) => p !== undefined);
+const stop = stopFor(clinic.geo);
+const locale = localeOf(Astro.url);
+const t = ui[locale];
+---
+
+<!--
+  A clinic page's booking panel (#foglalas): what can be booked online here, then the
+  clinic's numbers and details. Beside the copy and sticky on desktop, after the copy on phones.
+-->
+<section id="foglalas" aria-labelledby="foglalas-cim" class="scroll-mt-4 rounded-md border border-ink/20 bg-paper">
+  <h2 id="foglalas-cim" class="border-b border-line px-5 pt-5 pb-4 text-xl font-semibold">{t.clinicPanel.title}</h2>
+  <ul class="divide-y divide-line">
+    {
+      bookings.map(({ service, url }) => (
+        <li class="flex items-center justify-between gap-3 px-5 py-3">
+          <span class="leading-snug font-medium">{service.name}</span>
+          <a
+            href={url}
+            aria-label={t.bookOnlineAt(service.name, clinic.name)}
+            class="inline-flex h-11 shrink-0 items-center rounded-full bg-gold px-4 text-sm font-bold text-ink hover:brightness-95"
+          >
+            {t.bookOnline}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <div class="grid gap-4 border-t border-line px-5 py-4">
+    <div class:list={['grid gap-2', phones.length > 1 && 'grid-cols-2']}>
+      {
+        phones.map((phone) => (
+          <a
+            href={`tel:${phone}`}
+            aria-label={t.call(formatPhone(phone), clinic.name)}
+            class="inline-flex h-11 items-center justify-center rounded-full border border-ink/30 px-3 text-sm font-bold whitespace-nowrap tabular-nums hover:border-ink"
+          >
+            {formatPhone(phone)}
+          </a>
+        ))
+      }
+    </div>
+    <StreetMap clinic={clinic}>
+      <address class="grid gap-1 text-sm not-italic">
+        <p>{clinic.address.postalCode} {clinic.address.city}, {clinic.address.street}</p>
+        {
+          stop && (
+            <p class="flex items-center gap-1.5">
+              {t.clinicPanel.metro} {stop.lines.map((line) => <MetroRoundel line={line} />)} {stop.name}
+            </p>
+          )
+        }
+        <p><a href={directionsUrl(clinic.address)} class="underline underline-offset-4">{t.directions}</a></p>
+        <p><a href={`mailto:${clinic.email}`} class="underline underline-offset-4">{clinic.email}</a></p>
+      </address>
+    </StreetMap>
+    <ul class="text-sm text-ink-muted">
+      {clinic.hours.map((h) => <li>{formatHours(h, locale)}</li>)}
+    </ul>
+  </div>
+</section>

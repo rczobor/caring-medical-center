@@ -1,0 +1,110 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.svg';
+import { localeOf, pagePath } from '../lib/locale';
+import { nav, owned } from '../lib/nav';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+interface Props {
+  /**
+   * The page has its own booking panel. "Időpontfoglalás" then jumps to it, and
+   * below desktop width the page's fixed booking bar carries that button instead.
+   */
+  inPageBooking: boolean;
+  /** This page in the other language, or that language's homepage when it has no translation. */
+  otherLanguage: string;
+}
+const { inPageBooking, otherLanguage } = Astro.props;
+
+const path = pagePath(Astro.url);
+const isCurrent = (owns: string[]) => owned(owns, path);
+const locale = localeOf(Astro.url);
+const t = ui[locale];
+const link = await linker(locale);
+const language = t.otherLanguage;
+---
+
+<header class="relative z-20 border-b border-line bg-paper">
+  <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 lg:gap-8">
+    <a href={link('/')} class="shrink-0">
+      <Image src={logo} alt={t.header.logoAlt} height={56} class="h-12 w-auto lg:h-14" />
+    </a>
+    <nav aria-label={t.header.nav} class="ml-auto hidden lg:block">
+      <ul class="flex gap-5 font-medium whitespace-nowrap xl:gap-7">
+        {
+          nav[locale].map(({ href, label, owns }) => (
+            <li>
+              <a
+                href={href}
+                aria-current={isCurrent(owns) ? 'page' : undefined}
+                class="link-bar"
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <!-- Phones have no room for it beside the booking button; there it's the menu's last row. -->
+    <a
+      href={link('/kereses')}
+      aria-current={path === link('/kereses') ? 'page' : undefined}
+      class="hidden size-11 shrink-0 items-center justify-center rounded-full border border-line hover:border-ink/50 aria-[current]:border-gold-ink lg:inline-flex"
+    >
+      <span class="sr-only">{t.search.label}</span>
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+    </a>
+    {/* Named in its own language, so a visitor who reads only that one can find it. */}
+    <a href={otherLanguage} lang={language.lang} hreflang={language.hreflang} class="link-bar hidden text-sm font-medium text-ink-muted hover:text-ink lg:inline">
+      {language.label}
+    </a>
+    <a
+      href={inPageBooking ? '#foglalas' : link('/kapcsolat')}
+      class:list={[
+        'ml-auto h-11 shrink-0 items-center rounded-full bg-gold px-4 text-sm font-bold text-ink hover:brightness-95 lg:ml-0 lg:px-5',
+        inPageBooking ? 'hidden lg:inline-flex' : 'inline-flex',
+      ]}
+    >
+      {t.book}
+    </a>
+    <details class:list={['menu group lg:hidden', inPageBooking && 'ml-auto']}>
+      <summary
+        class="flex size-11 cursor-pointer list-none items-center justify-center rounded-full border border-line [&::-webkit-details-marker]:hidden"
+      >
+        <span class="sr-only">{t.header.menu}</span>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" class="group-open:hidden">
+          <path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" class="hidden group-open:block">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </summary>
+      <nav aria-label={t.header.nav} class="absolute inset-x-0 top-full border-b border-line bg-paper px-4 pb-4 shadow-sm">
+        <ul class="mx-auto max-w-6xl divide-y divide-line text-lg font-medium">
+          {
+            nav[locale].map(({ href, label, owns }) => (
+              <li>
+                <a href={href} aria-current={isCurrent(owns) ? 'page' : undefined} class="block py-3 aria-[current]:text-gold-ink">
+                  {label}
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <a href={link('/kereses')} aria-current={path === link('/kereses') ? 'page' : undefined} class="block py-3 aria-[current]:text-gold-ink">{t.search.label}</a>
+          </li>
+          <li>
+            <a href={otherLanguage} lang={language.lang} hreflang={language.hreflang} class="block py-3 text-ink-muted">
+              {language.label}
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </details>
+  </div>
+</header>

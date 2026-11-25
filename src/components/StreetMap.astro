@@ -1,0 +1,188 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import metro from '../assets/clinic-map-metro.svg';
+import map from '../assets/clinic-map.svg';
+import { danubeLng, project, splitName, width as mapWidth } from '../lib/clinic-map';
+import { stopFor } from '../lib/transit';
+import { uiFor } from '../lib/ui';
+import MetroRoundel from './MetroRoundel.astro';
+
+interface Props {
+  clinic: CollectionEntry<'clinics'>['data'];
+}
+const { clinic } = Astro.props;
+
+// A public Mapbox token (pk.…), restricted to the site's hostnames in the Mapbox console.
+// It reaches the page by design. Without one (a build that lacks the variable), the panel
+// keeps the drawn close-up and offers no street map.
+const token: string | undefined = import.meta.env.PUBLIC_MAPBOX_TOKEN;
+const [width, height] = [400, 300];
+// Centred on the clinic, so the marker drawn over it sits at the middle. Static Images zooms
+// count 512 px tiles: at zoom 14 and Budapest's latitude the 400 px image spans about 1.3 km,
+// close enough to name the streets around the clinic (the owner chose that over matching the
+// drawn close-up's 3.7 km). Mapbox draws the map, its logo and the credit it requires.
+const url = (scale: '' | '@2x') =>
+  `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/${clinic.geo.lng},${clinic.geo.lat},14,0/${width}x${height}${scale}?access_token=${token}`;
+const { x, y } = project(clinic.geo);
+// The close-up shows the overview map (about 44 km across) this many times the box width:
+// about 3.7 km, the street map's extent.
+const zoom = 12;
+const { brand, short } = splitName(clinic.name);
+// The clinic's metro stop, when one is a short walk away, placed on the close-up like the clinic.
+const nearby = stopFor(clinic.geo);
+const stop = nearby && { ...nearby, ...project(nearby) };
+const t = uiFor(Astro.url).streetMap;
+---
+
+<!--
+  The clinic on a map, in the clinic panel. Until the visitor asks, it is a close-up of the
+  site's own drawn map (no third party). The Mapbox street map loads only on request, since
+  loading it sends the visitor's IP address to Mapbox (brief: no third-party content
+  before consent). Mapbox's terms don't allow storing its images on our side.
+-->
+<div
+  data-street-map
+  data-name={clinic.name}
+  data-ui={JSON.stringify(t.script)}
+  data-src={token && url('')}
+  data-srcset={token && `${url('')} ${width}w, ${url('@2x')} ${width * 2}w`}
+  class="street-map relative aspect-[4/3] overflow-hidden rounded-sm border border-line bg-cream"
+  style={`--x: ${(x / mapWidth).toFixed(4)}; --y: ${(y / mapWidth).toFixed(4)}; --zoom: ${zoom}`}
+>
+  <img src={map.src} alt="" loading="lazy" decoding="async" class="close-up absolute max-w-none" />
+  {/* Metro lines only with the clinic's stop: elsewhere a clipped line would mean nothing. */}
+  {stop && <img src={metro.src} alt="" loading="lazy" decoding="async" class="close-up absolute max-w-none" />}
+  {
+    stop && (
+      <span
+        data-stop
+        aria-hidden="true"
+        class="stop absolute z-10 flex items-center gap-1 text-xs font-semibold whitespace-nowrap"
+        data-side={stop.lng < clinic.geo.lng ? 'left' : 'right'}
+        style={`--dx: ${((stop.x - x) / mapWidth).toFixed(4)}; --dy: ${((stop.y - y) / mapWidth).toFixed(4)}`}
+      >
+        {stop.lines.map((line) => (
+          <MetroRoundel line={line} />
+        ))}
+        {/* No box: on the map a box means a clinic. */}
+        <span class="[text-shadow:0_0_2px_#fff,0_0_4px_#fff,0_0_6px_#fff]">{stop.name}</span>
+      </span>
+    )
+  }
+  {/* As on the overview, the label hangs on the side away from the Danube. */}
+  <span class="pin absolute top-1/2 left-1/2 z-10 flex items-center gap-1.5" data-side={clinic.geo.lng < danubeLng ? 'left' : 'right'}>
+    <span aria-hidden="true" class="size-4 shrink-0 rounded-full border-2 border-ink bg-gold shadow-[0_0_0_3px_var(--color-paper)]"></span>
+    <span data-chip class="rounded-md bg-paper/95 px-2 py-0.5 text-sm leading-tight font-bold whitespace-nowrap ring-1 ring-ink/15">
+      {brand && <span class="block text-xs font-semibold text-ink-muted">{brand} </span>}
+      {short}
+    </span>
+  </span>
+  {
+    token && (
+      // A map control, quieter than the call buttons above it in the panel.
+      <button
+        type="button"
+        class="absolute bottom-2 left-2 z-10 inline-flex h-9 items-center gap-1.5 rounded-full bg-paper/95 px-3 text-sm font-medium ring-1 ring-ink/20 hover:ring-ink/50"
+      >
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="shrink-0 text-gold-ink">
+          <path d="M1.5 3.5l4-1.5 5 2 4-1.5v10l-4 1.5-5-2-4 1.5zM5.5 2v10M10.5 4v10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+        </svg>
+        <span>{t.load}</span>
+      </button>
+    )
+  }
+  <span class="osm-credit absolute right-1 bottom-1 rounded-sm bg-paper/85 px-1 text-[0.6875rem] text-ink-muted">© OpenStreetMap</span>
+</div>
+{/* The note is the map's caption, so the address, directions and hours stay together after it. */}
+{
+  token && (
+    <p class="-mt-2 text-sm text-ink-muted">
+      {t.note}
+      {/* Screen readers seldom announce a name change on the focused button, so failure is said here. */}
+      <span data-status aria-live="polite" class="sr-only"></span>
+    </p>
+  )
+}
+<slot />
+
+<style>
+  .street-map {
+    container-type: inline-size;
+  }
+  /* The dot (1rem) sits on the box centre; the label hangs beside it. */
+  .pin {
+    translate: -0.5rem -50%;
+  }
+  .pin[data-side='left'] {
+    translate: calc(-100% + 0.5rem) -50%;
+    flex-direction: row-reverse;
+  }
+  /* The stop sits at its offset from the clinic, at the close-up's scale. */
+  .stop {
+    left: calc(50cqw + var(--dx) * var(--zoom) * 100cqw);
+    top: calc(50% + var(--dy) * var(--zoom) * 100cqw);
+    translate: -0.625rem -50%;
+  }
+  .stop[data-side='left'] {
+    translate: calc(-100% + 0.625rem) -50%;
+    flex-direction: row-reverse;
+  }
+  /* The overview map, scaled up and shifted so the clinic's point sits at the box centre. */
+  .close-up {
+    width: calc(var(--zoom) * 100cqw);
+    left: calc(50cqw - var(--x) * var(--zoom) * 100cqw);
+    top: calc(50% - var(--y) * var(--zoom) * 100cqw);
+  }
+</style>
+
+<script>
+  for (const box of document.querySelectorAll<HTMLElement>('[data-street-map]')) {
+    const button = box.querySelector('button');
+    const status = box.nextElementSibling?.querySelector('[data-status]');
+    const { src, srcset } = box.dataset;
+    if (!button || !src || !srcset) continue;
+    // The page's language: the template sets the words on the box.
+    const words: { loading: string; retry: string; failed: string; label: string } = JSON.parse(box.dataset.ui ?? '{}');
+    button.addEventListener('click', () => {
+      // aria-disabled, not disabled: a disabled button drops keyboard focus at once.
+      if (button.getAttribute('aria-disabled') === 'true') return;
+      button.setAttribute('aria-disabled', 'true');
+      button.lastElementChild!.textContent = words.loading;
+      if (status) status.textContent = '';
+      const img = new Image();
+      img.alt = '';
+      // By displayed width: the panel is about 20rem wide on desktop, the full column on tablets.
+      img.sizes = '(min-width: 1024px) 20rem, 100vw';
+      img.srcset = srcset;
+      img.src = src;
+      img.className = 'absolute inset-0 size-full object-cover';
+      img.addEventListener('load', () => {
+        // The Mapbox image carries its own credits, so the drawn map's credit goes with it.
+        // Both drawn layers (the map and, with a stop, its metro lines) give way to it.
+        const [drawn, ...layers] = box.querySelectorAll('.close-up');
+        drawn?.replaceWith(img);
+        for (const layer of layers) layer.remove();
+        box.querySelector('.osm-credit')?.remove();
+        // The panel already names the clinic; on the street map the label would hide the
+        // street names the visitor asked for, so only the pin stays (owner, 2026-11-11).
+        box.querySelector('[data-chip]')?.remove();
+        // The stop was placed at the close-up's scale; the street map has its own.
+        box.querySelector('[data-stop]')?.remove();
+        // Removing the focused button would drop keyboard focus to the page top; keep it here.
+        // The box now holds only the picture, so it is announced as one: "Utcatérkép: <clinic>".
+        box.setAttribute('role', 'img');
+        box.setAttribute('aria-label', `${words.label}${box.dataset.name}`);
+        if (document.activeElement === button) {
+          box.tabIndex = -1;
+          box.focus();
+        }
+        button.remove();
+      });
+      img.addEventListener('error', () => {
+        button.removeAttribute('aria-disabled');
+        button.lastElementChild!.textContent = words.retry;
+        if (status) status.textContent = words.failed;
+      });
+    });
+  }
+</script>

@@ -1,0 +1,21 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { uiFor } from '../lib/ui';
+import StepList from './StepList.astro';
+
+interface Props {
+  service: CollectionEntry<'services'>;
+}
+const { steps, photo, photoAlt } = Astro.props.service.data;
+---
+
+<h2 id="menet" class="text-2xl font-semibold">{uiFor(Astro.url).serviceSteps}</h2>
+<StepList steps={steps} />
+<Image
+  src={photo}
+  alt={photoAlt}
+  widths={[480, 720, 960, 1280]}
+  sizes="(min-width: 1152px) 720px, (min-width: 1024px) 60vw, 100vw"
+  class="mt-8 aspect-[16/9] w-full rounded-md bg-line object-cover"
+/>

@@ -1,0 +1,133 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BookingOptions from '../components/BookingOptions.astro';
+import ClinicMap from '../components/ClinicMap.astro';
+import ContactForm from '../components/ContactForm.astro';
+import PageHero from '../components/PageHero.astro';
+import ClosingCta from '../components/ClosingCta.astro';
+import Base from '../layouts/Base.astro';
+import photo from '../assets/site/point-folyoso.jpg';
+import { bookingsFor } from '../lib/catalog';
+import { directionsUrl, formatHours, formatPhone } from '../lib/format';
+import { localeOf, localId, localize } from '../lib/locale';
+import { md } from '../lib/markdown';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+const locale = localeOf(Astro.url);
+const t = ui[locale];
+const link = await linker(locale);
+const page = await getEntry('pages', localId('kapcsolat', locale));
+const deposit = await getEntry('notes', localId('foglalasi-dij', locale));
+if (!page || !deposit) throw new Error(`Missing the contact page content or the deposit note (${locale})`);
+const { Content } = await render(page);
+const { Content: DepositTerms } = await render(deposit);
+
+const byPosition = (a: { data: { position: number } }, b: { data: { position: number } }) => a.data.position - b.data.position;
+const services = await Promise.all(
+  (await getCollection('bookingServices'))
+    .sort(byPosition)
+    .map(async (service) => ({ service: localize(service, locale), bookings: await bookingsFor(service.id) })),
+);
+const clinics = (await getCollection('clinics')).sort(byPosition);
+---
+
+<Base title={page.data.title} description={page.data.description}>
+  <PageHero
+    short
+    breadcrumbs={[{ label: t.homeCrumb, href: link('/') }, { label: t.contact.crumb }]}
+    title={page.data.heading}
+    image={{ src: photo, alt: t.contact.heroAlt }}
+  >
+    <p class="mt-4 max-w-[36rem] text-lg text-mist">{t.contact.lead}</p>
+  </PageHero>
+
+  <div class="mx-auto grid max-w-6xl gap-16 px-4 pt-12 pb-16 lg:pb-20">
+    <section aria-labelledby="mit-foglal">
+      <h2 id="mit-foglal" class="text-2xl font-semibold">{t.contact.what}</h2>
+      <div class="mt-6 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {
+          services.map(({ service, bookings }) => (
+            <section id={service.id} aria-labelledby={`foglalas-${service.id}`} class="scroll-mt-6 rounded-md border border-ink/20 bg-paper">
+              <div class="border-b border-line px-5 pt-4 pb-3">
+                <h3 id={`foglalas-${service.id}`} class="text-lg font-bold">
+                  <a href={link(service.data.page)} class="link-bar">
+                    {service.data.name}
+                  </a>
+                </h3>
+                {service.data.note && <p class="text-sm text-ink-muted">{service.data.note}</p>}
+              </div>
+              <BookingOptions bookings={bookings} level="h4" />
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="rendeloink" data-clinic-group>
+      <h2 id="rendeloink" class="text-2xl font-semibold">{t.contact.clinics}</h2>
+      <div class="mt-6">
+        <ClinicMap clinics={clinics} />
+      </div>
+      <div class="mt-8 grid gap-8 md:grid-cols-3">
+        {
+          clinics.map(({ id, data: clinic }) => (
+            <section id={id} data-clinic={id} aria-labelledby={`rendelo-${id}`} class="grid scroll-mt-6 content-start gap-3 border-t-2 border-gold pt-4">
+              <h3 id={`rendelo-${id}`} class="text-lg font-bold">
+                <a href={link(clinic.page)} class="link-bar">
+                  {clinic.name}
+                </a>
+              </h3>
+              <address class="grid gap-1 not-italic">
+                <p>
+                  {clinic.address.postalCode} {clinic.address.city}, {clinic.address.street}
+                </p>
+                <p class="tabular-nums">
+                  <a href={`tel:${clinic.phone}`} class="underline underline-offset-4">
+                    {formatPhone(clinic.phone)}
+                  </a>
+                  {clinic.otherPhone && (
+                    <>
+                      {', '}
+                      <a href={`tel:${clinic.otherPhone}`} class="underline underline-offset-4">
+                        {formatPhone(clinic.otherPhone)}
+                      </a>
+                    </>
+                  )}
+                </p>
+                <p>
+                  <a href={`mailto:${clinic.email}`} class="underline underline-offset-4">
+                    {clinic.email}
+                  </a>
+                </p>
+              </address>
+              <ul class="text-sm text-ink-muted">
+                {clinic.hours.map((h) => (
+                  <li>{formatHours(h, locale)}</li>
+                ))}
+              </ul>
+              <p class="text-sm">
+                <a href={directionsUrl(clinic.address)} class="underline underline-offset-4">
+                  {t.directions}
+                </a>
+              </p>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <div class="grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
+      <ContactForm fallbackPhone={clinics[0]!.data.phone} />
+      <div class="copy"><Content /></div>
+    </div>
+
+    <section id="foglalasi-dij" aria-labelledby="foglalasi-dij-cim" class="copy max-w-3xl scroll-mt-6 rounded-md bg-cream px-5 py-5 text-[0.95rem]">
+      <h2 id="foglalasi-dij-cim">{deposit.data.title}</h2>
+      {deposit.data.lead && <p class="font-bold">{deposit.data.lead}</p>}
+      <Fragment set:html={md(deposit.data.summary)} />
+      <DepositTerms />
+    </section>
+  </div>
+  <ClosingCta href="#mit-foglal" />
+</Base>

@@ -1,0 +1,42 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import PriceListPage from '../components/PriceListPage.astro';
+import { examPath, serviceIn } from '../lib/catalog';
+import { inLocale, localeOf, localId } from '../lib/locale';
+import { ui } from '../lib/ui';
+
+const locale = localeOf(Astro.url);
+const t = ui[locale].priceList.xrayMri;
+const page = await getEntry('pages', localId('rontgen-es-mr-arak', locale));
+const mrService = await serviceIn('mr', locale);
+if (!page) throw new Error(`Missing price page content (${locale})`);
+
+// In the price file's own order, as the clinic lists them.
+const prices = (await getCollection('prices')).sort((a, b) => a.data.position - b.data.position);
+
+// Link each price row to the exam page that lists it; the first exam wins where rows are shared.
+const links: Record<string, string> = {};
+for (const exam of (await getCollection('exams', inLocale(locale))).sort((a, b) => a.id.localeCompare(b.id))) {
+  const service = await serviceIn(exam.data.service.id, locale);
+  for (const ref of exam.data.prices) links[ref.id] ??= examPath(service, exam);
+}
+---
+
+<PriceListPage
+  page={page}
+  breadcrumb={t.crumb}
+  searchable
+  deposit={mrService.data.deposit}
+  links={links}
+  sections={[
+    // X-ray add-ons stay with the X-ray rows, as on the clinic's own price list.
+    { id: 'rontgen', title: t.xray, rows: prices.filter((p) => p.data.category === 'rtg') },
+    {
+      id: 'mr',
+      title: t.mri,
+      rows: prices.filter((p) => p.data.category === 'mr' && !p.data.extra),
+      notes: [page.data.mrNote, mrService.data.contrastNote],
+    },
+    { id: 'kiegeszito', title: t.extras, rows: prices.filter((p) => p.data.category === 'mr' && p.data.extra) },
+  ]}
+/>

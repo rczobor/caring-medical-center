@@ -1,0 +1,154 @@
+---
+// Site search. The index is built from the finished pages (searchIndex in astro.config.mjs)
+// and searched in the browser, so it works on any static host and sends nothing anywhere.
+// `?q=` makes a search linkable; the 404 page and the header link here.
+// Each language has its own index (Pagefind splits by <html lang>), so the English page finds
+// only English pages, and Hungarian keeps its stemming.
+// New page, so all its copy is new (FLAGGED H8).
+import PageHero from '../components/PageHero.astro';
+import ClosingCta from '../components/ClosingCta.astro';
+import Base from '../layouts/Base.astro';
+import { localeOf } from '../lib/locale';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+const locale = localeOf(Astro.url);
+const t = ui[locale].search;
+const link = await linker(locale);
+---
+
+<Base title={t.title} description={t.description} searchable={false}>
+  <PageHero title={t.label}>
+    <form role="search" action={link('/kereses')} data-search data-ui={JSON.stringify(t.script)} class="mt-6 grid max-w-xl gap-2">
+      <label for="kereses-mezo" class="font-bold">{t.question}</label>
+      <div class="flex gap-3">
+        <input
+          id="kereses-mezo"
+          name="q"
+          type="search"
+          autocomplete="off"
+          placeholder={t.placeholder}
+          class="h-12 min-w-0 flex-1 rounded-md border border-cream/30 bg-paper px-4 text-lg text-ink placeholder:text-ink-muted"
+        />
+        <button type="submit" class="h-12 shrink-0 rounded-full bg-gold px-6 font-bold text-ink hover:brightness-95">{t.label}</button>
+      </div>
+    </form>
+  </PageHero>
+
+  <div class="mx-auto max-w-6xl px-4 pt-10 pb-16 lg:pb-20">
+    <p data-search-status role="status" class="text-ink-muted"></p>
+    <ol data-search-results aria-label={t.results} class="mt-6 max-w-3xl divide-y divide-line border-t border-ink" hidden></ol>
+    <noscript>
+      <p class="text-ink-muted">{t.noScript.before}<a href={link('/#panaszok')} class="text-gold-ink underline">{t.noScript.link}</a>{t.noScript.after}</p>
+    </noscript>
+  </div>
+  <ClosingCta />
+</Base>
+
+<script>
+  // The parts of Pagefind's browser API this page uses.
+  interface PagefindResult {
+    data(): Promise<{ url: string; excerpt: string; meta: { title?: string } }>;
+  }
+  interface Pagefind {
+    debouncedSearch(query: string, options?: object, ms?: number): Promise<{ results: PagefindResult[] } | null>;
+  }
+
+  const shown = 20;
+  const form = document.querySelector<HTMLFormElement>('[data-search]');
+  const input = form?.querySelector<HTMLInputElement>('input[name="q"]');
+  const status = document.querySelector<HTMLElement>('[data-search-status]');
+  const list = document.querySelector<HTMLOListElement>('[data-search-results]');
+  // The page's language: the template sets the words.
+  const words = JSON.parse(form?.dataset.ui ?? '{}') as {
+    unavailable: string;
+    none: [string, string];
+    many: [string, string];
+    count: string;
+    countOne: string;
+  };
+
+  // Built after the site, so Vite must leave the path alone. Absent under `astro dev`.
+  const bundle = '/pagefind/pagefind.js';
+  let pagefind: Promise<Pagefind> | undefined;
+  // A failed load is forgotten, so the next search tries again.
+  const load = () =>
+    (pagefind ??= (import(/* @vite-ignore */ bundle) as Promise<Pagefind>).catch((error: unknown) => {
+      pagefind = undefined;
+      throw error;
+    }));
+  // Only the latest query may write: an older one can finish later.
+  let latest = 0;
+
+  /** The excerpt with only its text and <mark> highlights kept, whatever else it holds. */
+  function excerpt(html: string) {
+    const p = document.createElement('p');
+    p.className = 'mt-1 text-ink-muted';
+    for (const node of new DOMParser().parseFromString(html, 'text/html').body.childNodes) {
+      if (node.nodeName === 'MARK') p.append(Object.assign(document.createElement('mark'), { textContent: node.textContent, className: 'rounded-sm bg-gold/40 text-ink' }));
+      else p.append(node.textContent ?? '');
+    }
+    return p;
+  }
+
+  async function run(query: string) {
+    if (!status || !list) return;
+    const id = ++latest;
+    const q = query.trim();
+    history.replaceState(null, '', q ? `?q=${encodeURIComponent(q)}` : location.pathname);
+    if (!q) {
+      list.hidden = true;
+      status.textContent = '';
+      return;
+    }
+    let search: Awaited<ReturnType<Pagefind['debouncedSearch']>>;
+    let pages: Awaited<ReturnType<PagefindResult['data']>>[];
+    try {
+      search = await (await load()).debouncedSearch(q, {}, 200);
+      if (!search || id !== latest) return;
+      pages = await Promise.all(search.results.slice(0, shown).map((r) => r.data()));
+    } catch {
+      // Never leave an earlier query's results under the error.
+      if (id === latest) {
+        list.hidden = true;
+        status.textContent = words.unavailable;
+      }
+      return;
+    }
+    if (id !== latest) return;
+    list.replaceChildren(
+      ...pages.map(({ url, meta, excerpt: text }) => {
+        const a = Object.assign(document.createElement('a'), { href: url.replace(/\.html$/, ''), className: 'block py-4' });
+        const title = Object.assign(document.createElement('span'), { className: 'link-bar text-lg font-bold', textContent: meta.title ?? url });
+        a.append(title, excerpt(text));
+        const li = document.createElement('li');
+        li.append(a);
+        return li;
+      }),
+    );
+    list.hidden = pages.length === 0;
+    const total = search.results.length;
+    status.textContent =
+      total === 0
+        ? `${words.none[0]}${q}${words.none[1]}`
+        : total > shown
+          ? `${total}${words.many[0]}${shown}${words.many[1]}`
+          : `${total}${total === 1 ? words.countOne : words.count}`;
+  }
+
+  if (form && input) {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      void run(input.value);
+    });
+    input.addEventListener('input', () => void run(input.value));
+    input.addEventListener('focus', () => void load().catch(() => {}), { once: true });
+    const initial = new URLSearchParams(location.search).get('q');
+    if (initial) {
+      input.value = initial;
+      void run(initial);
+    } else {
+      input.focus();
+    }
+  }
+</script>

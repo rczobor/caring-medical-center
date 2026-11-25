@@ -1,0 +1,10 @@
+{
+  "extends": "astro/tsconfigs/strictest",
+  "compilerOptions": {
+    // Content files name their images as @assets/…, the same from any folder depth, so the
+    // CMS can write one path for a page and its translation (public/admin/config.yml).
+    "paths": { "@assets/*": ["./src/assets/*"] }
+  },
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"]
+}

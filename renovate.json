@@ -1,0 +1,23 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "semanticCommits": "enabled",
+  "timezone": "Europe/Budapest",
+  "schedule": ["before 6am on monday"],
+  "minimumReleaseAge": "3 days",
+  "lockFileMaintenance": { "enabled": true },
+  "postUpdateOptions": ["pnpmDedupe"],
+  "packageRules": [
+    {
+      "description": "One weekly PR for routine updates; majors and 0.x stay separate.",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "groupName": "non-major dependencies"
+    },
+    {
+      "description": "Overrides are workaround pins; pnpm-workspace.yaml says when to remove each.",
+      "matchDepTypes": ["pnpm-workspace.overrides"],
+      "enabled": false
+    }
+  ]
+}

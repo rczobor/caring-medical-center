@@ -1,0 +1,59 @@
+- id: szekely-gyorgy
+  name: Dr. Székely György
+  role: Idegsebész
+  photo: '@assets/site/2pxbNOZ6liMGHfEVDQzhnEdvKk.jpg'
+  en:
+    role: Neurosurgeon
+- id: szelid-zsolt
+  name: Dr. Szelid Zsolt
+  role: Kardiológus szakorvos
+  photo: '@assets/site/Am90HrpJKQaAhHRRRnfPJ5am4.jpg'
+  profile: https://medicalpoint.hu/caregiver/dr-szelid-zsolt/
+  en:
+    role: Cardiologist
+- id: hetthessy-judit-reka-phd
+  name: Dr. Hetthéssy Judit Réka PhD
+  role: európai szakvizsgás kézsebész
+  photo: '@assets/site/WxKgRRXxpN6FaqH7aKSEmJT8xKE.jpg'
+  en:
+    role: Hand surgeon, European board certified
+- id: tompa-szabolcs
+  name: Dr. Tompa Szabolcs
+  role: európai szakvizsgás kézsebész
+  photo: '@assets/site/LsFRcgsJZq1929EzTA7n5BxxMA.jpg'
+  en:
+    role: Hand surgeon, European board certified
+- id: heid-akos
+  name: Dr. Heid Ákos
+  role: Ortopédia / Traumatológia
+  photo: '@assets/site/dPeD077tGukwh5QUv5BXdDpTBaI.jpg'
+  en:
+    role: Orthopedics / Traumatology
+- id: magyari-zoltan
+  name: Dr. Magyari Zoltán
+  role: Traumatológia
+  photo: '@assets/site/5dUXqw3jKOJRXE7P2oNoPKnHs.jpg'
+  profile: https://medicalpoint.hu/caregiver/dr-magyari-zoltan/
+  en:
+    role: Traumatology
+- id: berkes-istvan
+  name: Prof. Dr. Berkes István
+  role: Ortopéd szakorvos, Térd specialista
+  photo: '@assets/site/prxzceiBGpXwt3BaU6h7PCeGyE.jpg'
+  profile: https://medicalpoint.hu/caregiver/prof-dr-berkes-istvan/
+  en:
+    role: Orthopedic specialist, knee specialist
+- id: pal-monika
+  name: Dr. Pál Mónika
+  role: Reumatológus, fizioterápiás szakorvos
+  photo: '@assets/site/UQRc0nPrvOkUz6GbVrGKnP7pg3A.jpg'
+  booking: https://drpalmonika.hu/
+  en:
+    role: Rheumatologist, physical medicine specialist
+- id: selyem-reka-erzsebet
+  name: Dr. Selyem Réka Erzsébet
+  role: reumatológus szakorvos
+  photo: '@assets/site/7WVHfRReRmqYkloya7Y5NWOrANY.jpg'
+  booking: https://medicalpoint.mymedio.hu/doctors?doctorId=431681
+  en:
+    role: Rheumatologist

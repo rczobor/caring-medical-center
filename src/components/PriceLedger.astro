@@ -1,0 +1,44 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatHuf, formatMinutes } from '../lib/format';
+import { localeOf, localize } from '../lib/locale';
+
+interface Props {
+  rows: CollectionEntry<'prices'>[];
+  /** Exam page per price row id, to link a row's name. */
+  links?: Record<string, string>;
+}
+const { rows, links = {} } = Astro.props;
+const locale = localeOf(Astro.url);
+---
+
+<!--
+  Set like the clinic's printed price sheet: name, dotted leader, minutes, price.
+  On phones the name takes its own line, where a leader would start from nothing:
+  the leader becomes a plain spacer, minutes sit under the name and the price
+  stays right (visual order only; the reading order is unchanged).
+-->
+<ul class="border-t border-ink">
+  {
+    rows.map((row) => localize(row, locale)).map(({ id, data }) => (
+      <li class="flex flex-wrap items-baseline gap-x-3 border-b border-line py-3 sm:flex-nowrap">
+        <span class="basis-full pb-1 sm:basis-auto sm:pb-0">
+          {links[id] ? (
+            <a href={links[id]} class="underline decoration-ink/30 underline-offset-4 hover:decoration-ink">
+              {data.name}
+            </a>
+          ) : (
+            data.name
+          )}
+        </span>
+        <span aria-hidden="true" class="order-2 min-w-6 flex-1 -translate-y-1 sm:order-none sm:border-b-2 sm:border-dotted sm:border-ink/25" />
+        {data.minutes && <span class="text-ink-muted tabular-nums">{formatMinutes(locale, data.minutes)}</span>}
+        {/* At least the usual price's width, so prices line up; wider for one with a unit ("HUF 50,000/hour"). */}
+        <span class="order-2 min-w-[6.5rem] text-right font-display text-lg font-semibold whitespace-nowrap tabular-nums sm:order-none">
+          {formatHuf(data.huf, locale)}
+          {data.unit}
+        </span>
+      </li>
+    ))
+  }
+</ul>

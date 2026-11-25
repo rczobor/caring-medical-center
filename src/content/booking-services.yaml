@@ -1,0 +1,37 @@
+# What patients can book, in the order the contact page lists them, and the page
+# that describes each. Which clinic offers what, and how to book it, lives in
+# clinics.yaml under `booking`.
+- id: mr
+  name: MR vizsgálat
+  page: /mrvizsgalat
+  en:
+    name: MRI scan
+- id: ct
+  name: CT vizsgálat
+  page: /ct-vizsgalatok
+  en:
+    name: CT scan
+- id: rontgen
+  name: Röntgenvizsgálat
+  page: /rontgenvizsgalat
+  en:
+    name: X-ray
+- id: emlo
+  name: Komplex emlőszűrés
+  # Source: /kapcsolat-caringmedical-idopontok
+  note: 3D mammográfia, emlőultrahang és szakorvosi fizikális vizsgálat
+  page: /mammografia-vizsgalat
+  en:
+    name: Comprehensive breast screening
+    note: 3D mammography, breast ultrasound and a physical exam by a specialist
+- id: labor
+  name: Laboratóriumi diagnosztika
+  page: /laborvizsgalatok
+  en:
+    name: Laboratory tests
+- id: magnes
+  # Caring Medical Point labels this "Mágneses Stimulációs Kezelés" (FLAGGED B4).
+  name: Mágnesterápia
+  page: /rehabilitacio/magnesterapia
+  en:
+    name: Magnetic therapy

@@ -1,0 +1,24 @@
+---
+import ClosingCta from '../components/ClosingCta.astro';
+import Base from '../layouts/Base.astro';
+---
+
+<!-- The host serves this one page for every missing address, English ones included, so it speaks both languages. -->
+<Base title="Az oldal nem található – Caring Medical Center" description="A keresett oldal nem található." searchable={false}>
+  <section class="mx-auto max-w-6xl px-4 py-16">
+    <h1 class="text-3xl font-bold">Az oldal nem található</h1>
+    <p class="mt-4 text-ink-muted">
+      Lehet, hogy az oldal elköltözött. <a href="/" class="text-gold-ink underline">Vissza a főoldalra</a>,
+      <!-- new (FLAGGED H8) -->
+      vagy <a href="/kereses" class="text-gold-ink underline">keressen az oldalon</a>.
+    </p>
+    <div lang="en" class="mt-10 border-t border-line pt-6">
+      <h2 class="text-xl font-bold">Page not found</h2>
+      <p class="mt-2 text-ink-muted">
+        The page may have moved. <a href="/en" class="text-gold-ink underline">Go to the English home page</a>,
+        or <a href="/en/search" class="text-gold-ink underline">search the site</a>.
+      </p>
+    </div>
+  </section>
+  <ClosingCta />
+</Base>

@@ -1,0 +1,525 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms@0.256.1/schema/sveltia-cms.json
+#
+# Sveltia CMS at /admin. It edits the files in src/content/ and commits them to
+# GitHub; the Zod schemas in src/content.config.ts still decide what builds.
+# tests/cms-config.spec.ts checks that every key in an editable file has a field
+# here, since a save writes only the configured fields.
+# Images are written as @assets/… (a tsconfig.json alias), which Astro resolves the
+# same from any folder, so a page and its English copy one folder deeper share a path.
+#
+# English pages: each page's English copy is its own file in an en/ folder beside the
+# Hungarian one (src/content/README.md), and the editor shows the two as one entry
+# with a language switch. Shared values (image, doctors, booking panel…) are
+# `duplicate`: edited in Hungarian and copied to the English file on save.
+
+backend:
+  name: github
+  repo: rczobor/caringmedical-site
+  branch: main
+  # The sveltia-cms-auth Worker in the same Cloudflare account.
+  base_url: https://sveltia-cms-auth.czobor94.workers.dev
+  # The repo squash-merges every PR.
+  squash_merges: true
+
+# Every save opens a pull request with its own Workers preview; Publish merges it.
+publish_mode: preview
+
+app_title: Caring Medical – szerkesztő
+site_url: https://caringmedical-site.czobor94.workers.dev
+
+media_folder: src/assets/site
+public_folder: '@assets/site'
+media_libraries:
+  default:
+    config:
+      slugify_filename: true
+      max_file_size: 15000000
+      transformations:
+        raster_image:
+          format: webp
+          quality: 85
+          width: 2400
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+output:
+  omit_empty_optional_fields: true
+
+i18n:
+  structure: multiple_folders
+  locales: [hu, en]
+  # Hungarian files stay where the site has always kept them; only English gets a folder.
+  omit_default_locale_from_file_path: true
+  omit_default_locale_from_preview_path: true
+  # A new page or article starts in Hungarian only; English can be switched on from the editor's menu.
+  initial_locales: default
+
+collections:
+  - name: arak
+    label: Árak
+    icon: payments
+    files:
+      - name: arlista
+        label: Árlista
+        file: src/content/prices.yaml
+        fields:
+          - name: rows
+            label: Ártételek
+            label_singular: ártétel
+            widget: list
+            root: true
+            collapsed: true
+            # A copied row keeps its ID, and the build fails on a repeated one.
+            allow_duplicate: false
+            summary: '{{fields.name}} – {{fields.huf}} Ft'
+            hint: A sorrend itt ugyanaz, mint az oldalakon.
+            fields:
+              - name: id
+                label: Azonosító
+                pattern: ['^[a-z0-9-]+$', 'Csak kisbetű, szám és kötőjel.']
+                hint: 'Új tételnél pl. "terd-nativ-mr". Meglévőt ne írjon át: a vizsgálati oldalak erre hivatkoznak.'
+              - name: category
+                label: Árlista
+                widget: select
+                options:
+                  - { label: Röntgen, value: rtg }
+                  - { label: MR, value: mr }
+                  - { label: CT, value: ct }
+                  - { label: Rehabilitáció és szakrendelés, value: rehab }
+              - { name: name, label: Megnevezés }
+              - { name: minutes, label: Időtartam (perc), widget: number, value_type: int, min: 1, required: false }
+              - { name: huf, label: Ár (Ft), widget: number, value_type: int, min: 1 }
+              - { name: unit, label: Egység, required: false, hint: 'Ha nem vizsgálatonként értendő, pl. "/óra".' }
+              - { name: extra, label: Kiegészítő tétel, widget: boolean, required: false, hint: 'Pl. felár vagy további felvétel. Nem számít bele a "…-tól" árba.' }
+              - name: en
+                label: Angolul
+                widget: object
+                required: false
+                hint: Az angol oldalakon ez jelenik meg. Üresen a magyar szöveg látszik.
+                fields:
+                  - { name: name, label: Megnevezés angolul }
+                  - { name: unit, label: Egység angolul, required: false, hint: 'Pl. "/hour".' }
+
+  - name: vizsgalatok
+    label: MR-vizsgálatok
+    icon: radiology
+    folder: src/content/exams/{{locale}}/mr
+    i18n: true
+    create: false
+    delete: false
+    # The English file has an English name (knee-mri.md); translationKey names the Hungarian one.
+    slug: { template: '{{title}}', i18n: true }
+    summary: '{{title}}'
+    preview_path: /{{locale}}/mrvizsgalat/{{slug}}
+    fields:
+      - { name: title, label: Cím, i18n: true }
+      - { name: service, widget: hidden, default: mr, i18n: duplicate }
+      - name: prices
+        i18n: duplicate
+        label: Árak az oldalon
+        widget: relation
+        multiple: true
+        # Some exams list no price yet.
+        required: false
+        collection: arak
+        file: arlista
+        value_field: rows.*.id
+        display_fields: [rows.*.name]
+        search_fields: [rows.*.name]
+        hint: Az árlista tételei, ebben a sorrendben.
+      - &body { name: body, label: Szöveg, widget: richtext, i18n: true }
+
+  - name: oldalak
+    label: Oldalak
+    icon: description
+    folder: src/content/site/{{locale}}
+    i18n: true
+    create: false
+    delete: false
+    slug: { template: '{{title}}', i18n: true }
+    summary: '{{heading}}'
+    preview_path: /{{locale}}/{{slug}}
+    fields:
+      - &title { name: title, i18n: true, label: Böngészőcím (title), hint: 'A böngészőfülön és a Google-találatban jelenik meg.' }
+      - &description { name: description, label: Leírás a keresőknek, widget: text, required: false, i18n: true, hint: 'Üresen az oldal első bekezdése lesz a leírás.' }
+      - &heading { name: heading, label: Főcím, i18n: true }
+      - &eyebrow { name: eyebrow, label: Felirat a főcím felett, required: false, i18n: true }
+      - &image { name: image, label: Kép, widget: image, required: false, i18n: duplicate }
+      - &imageAlt { name: imageAlt, label: A kép szöveges leírása, required: false, i18n: true, hint: 'Felolvasóprogramoknak. Díszítő képnél maradjon üresen.' }
+      - &bookingService
+        name: bookingService
+        label: Foglalási panel
+        widget: relation
+        i18n: duplicate
+        required: false
+        collection: foglalhato
+        file: szolgaltatasok
+        value_field: rows.*.id
+        display_fields: [rows.*.name]
+        hint: Ha meg van adva, az oldal mellett megjelenik az időpontfoglalás.
+      - name: prices
+        label: Árlista az oldalon
+        widget: object
+        required: false
+        i18n: true
+        fields:
+          - name: category
+            label: Árlista
+            widget: select
+            i18n: duplicate
+            options:
+              - { label: Röntgen, value: rtg }
+              - { label: MR, value: mr }
+              - { label: CT, value: ct }
+              - { label: Rehabilitáció és szakrendelés, value: rehab }
+          - { name: title, label: Cím, i18n: true }
+      - name: fromPrices
+        label: Legalacsonyabb árak a szöveg előtt
+        widget: list
+        required: false
+        i18n: true
+        hint: Árlistánként a legolcsóbb vizsgálat ára („… Ft-tól”), az árlistából számolva.
+        fields:
+          - name: category
+            label: Árlista
+            widget: select
+            i18n: duplicate
+            options:
+              - { label: Röntgen, value: rtg }
+              - { label: MR, value: mr }
+              - { label: CT, value: ct }
+              - { label: Rehabilitáció és szakrendelés, value: rehab }
+          - { name: label, label: Felirat, i18n: true }
+          - { name: page, label: Link (például /ct-arak), pattern: ['^/', 'Perjellel kezdődő cím, például /ct-arak'], i18n: true }
+      - &faq
+        name: faq
+        label: Gyakori kérdések
+        widget: object
+        required: false
+        i18n: true
+        fields:
+          - { name: title, label: Cím, i18n: true }
+          - name: items
+            label: Kérdések
+            widget: list
+            min: 1
+            i18n: true
+            fields:
+              - { name: question, label: Kérdés, i18n: true }
+              - { name: answer, label: Válasz, widget: text, hint: 'Markdown használható.', i18n: true }
+      # Hungarian only: the English files have none.
+      - &source { name: source, label: Eredeti oldal a régi webhelyen, required: false, readonly: true }
+      - *body
+
+  - name: szakrendelesek
+    label: Szakrendelések
+    icon: stethoscope
+    folder: src/content/site/{{locale}}/szakrendelesek
+    i18n: true
+    create: false
+    delete: false
+    slug: { template: '{{title}}', i18n: true }
+    summary: '{{heading}}'
+    preview_path: /{{locale}}/szakrendelesek/{{slug}}
+    fields:
+      - *title
+      - *description
+      - *heading
+      - *eyebrow
+      - *image
+      - *imageAlt
+      - *bookingService
+      - &doctors
+        name: doctors
+        label: Orvosok
+        widget: relation
+        i18n: duplicate
+        multiple: true
+        required: false
+        collection: orvosok
+        file: orvosok
+        value_field: rows.*.id
+        display_fields: [rows.*.name]
+        search_fields: [rows.*.name]
+        hint: Az oldal mellett, ebben a sorrendben.
+      - { name: doctorsNote, label: Megjegyzés az orvosok alatt, required: false, i18n: true }
+      - *faq
+      - *source
+      - *body
+
+  - name: panaszok
+    label: Panaszok
+    icon: healing
+    folder: src/content/site/{{locale}}/panaszok
+    i18n: true
+    summary: '{{heading}}'
+    # The file name is the page's address: /panaszok/<file name>, in English /en/conditions/<file name>.
+    slug: { template: '{{eyebrow}}', i18n: true }
+    preview_path: /{{locale}}/panaszok/{{slug}}
+    fields:
+      - *title
+      - *description
+      - *heading
+      - { name: eyebrow, label: Felirat a főcím felett, i18n: true, hint: 'A panasz rövid neve, pl. "Térdfájdalom".' }
+      - *image
+      - *imageAlt
+      - *doctors
+      - name: pathway
+        label: Lépések
+        label_singular: lépés
+        widget: list
+        summary: '{{fields.title}}'
+        hint: A szöveg után, számozva, ebben a sorrendben.
+        i18n: true
+        fields:
+          - { name: title, label: Cím, i18n: true }
+          - { name: text, label: Szöveg, widget: text, i18n: true }
+          - name: links
+            label: Oldalak
+            label_singular: oldal
+            widget: list
+            min: 1
+            summary: '{{fields.name}}'
+            i18n: true
+            fields:
+              - { name: name, label: Név, i18n: true }
+              - { name: page, i18n: true, label: Hivatkozott oldal, pattern: ['^/', 'Perjellel kezdődő cím, pl. /mrvizsgalat/terdizuleti-mr'], hint: 'Vizsgálati oldalnál vagy árlistát mutató oldalnál a „…-tól” ár magától megjelenik.' }
+      - *faq
+      - *body
+
+  - name: rehabilitacio
+    label: Rehabilitáció
+    icon: physical_therapy
+    folder: src/content/site/{{locale}}/rehabilitacio
+    i18n: true
+    create: false
+    delete: false
+    slug: { template: '{{title}}', i18n: true }
+    summary: '{{heading}}'
+    preview_path: /{{locale}}/rehabilitacio/{{slug}}
+    fields:
+      - *title
+      - *description
+      - *heading
+      - *eyebrow
+      - *image
+      - *imageAlt
+      - *bookingService
+      - *faq
+      - *source
+      - *body
+
+  - name: hirek
+    label: Hírek
+    label_singular: hír
+    icon: newspaper
+    folder: src/content/site/{{locale}}/hirek
+    i18n: true
+    # The file name is the article's address: /hirek/<file name>, in English /en/news/<file name>.
+    slug: { template: '{{heading}}', i18n: true }
+    summary: '{{heading}}'
+    sortable_fields: [date, heading]
+    preview_path: /{{locale}}/hirek/{{slug}}
+    fields:
+      - { name: title, label: Böngészőcím (title), i18n: true, hint: 'Szokás szerint: "<főcím> – Caring Medical Center".' }
+      - *heading
+      - *image
+      - *imageAlt
+      - { name: date, label: Dátum, widget: datetime, type: date, format: YYYY-MM-DD, i18n: duplicate }
+      - *source
+      # Some older articles are a heading and a date only.
+      - { name: body, label: Szöveg, widget: richtext, required: false, i18n: true }
+
+  - name: fooldal
+    label: Főoldal
+    icon: home
+    i18n: true
+    files:
+      - name: fooldal
+        label: Főoldal
+        file: src/content/{{locale}}/home.yaml
+        i18n: true
+        preview_path: /{{locale}}
+        media_folder: /src/assets/photos
+        public_folder: '@assets/photos'
+        fields:
+          - *title
+          - { name: description, label: Leírás a keresőknek, widget: text, i18n: true }
+          - *heading
+          - { name: lead, label: Bevezető, widget: text, i18n: true }
+          - { name: image, label: Megosztási kép, widget: image, i18n: duplicate, hint: 'Ezt mutatja egy megosztott link előnézete (Facebook, Messenger). A nyitókép az MR-vizsgálat fotója.' }
+          - { name: helpTitle, label: '„Miben segíthetünk?” címe', i18n: true }
+          - { name: helpIntro, label: '„Miben segíthetünk?” bevezetője', widget: text, i18n: true }
+          - name: complaints
+            label: Panaszok
+            widget: list
+            i18n: true
+            min: 1
+            summary: '{{fields.name}}'
+            fields:
+              - &helpName { name: name, label: Cím, i18n: true }
+              - &helpText { name: text, label: Rövid szöveg, hint: 'Egy sor, pl. "Térdizületi MR, ortopédia, gyógytorna".', i18n: true }
+              - { name: page, label: Hivatkozott oldal, pattern: ['^/', 'Perjellel kezdődő cím, pl. /panaszok/terdfajdalom'], i18n: true }
+          - name: shortcuts
+            label: Gyors linkek a panaszok alatt
+            widget: list
+            i18n: true
+            summary: '{{fields.name}}'
+            fields:
+              - *helpName
+              - *helpText
+              - { name: page, label: Hivatkozott oldal, pattern: ['^/', 'Perjellel kezdődő cím, pl. /paciensinformaciok'], i18n: true }
+          - { name: diagnosticsTitle, label: '„Diagnosztika” címe', i18n: true }
+          - name: diagnostics
+            label: Diagnosztikai szolgáltatások
+            widget: list
+            i18n: true
+            summary: '{{fields.title}}'
+            fields:
+              - { name: title, label: Cím, i18n: true }
+              - { name: text, label: Szöveg, widget: text, i18n: true }
+              - { name: page, label: Hivatkozott oldal, pattern: ['^/', 'Perjellel kezdődő cím, pl. /mrvizsgalat'], i18n: true }
+              - name: prices
+                label: '„…-tól” ár ebből az árlistából'
+                widget: select
+                i18n: true
+                required: false
+                options:
+                  - { label: Röntgen, value: rtg }
+                  - { label: MR, value: mr }
+                  - { label: CT, value: ct }
+          - { name: aboutTitle, label: '„Rólunk” címe', i18n: true }
+          - { name: aboutText, label: '„Rólunk” szövege', widget: text, i18n: true }
+          - name: stats
+            label: Számok
+            widget: list
+            i18n: true
+            summary: '{{fields.value}} {{fields.label}}'
+            fields:
+              - { name: value, label: Szám, hint: 'Pl. "20+"', i18n: true }
+              - { name: label, label: Felirat, i18n: true }
+              - { name: text, label: Szöveg, widget: text, i18n: true }
+          - { name: specialtiesTitle, label: '„Szakrendelések” címe', i18n: true }
+          - { name: specialtiesIntro, label: '„Szakrendelések” bevezetője', widget: text, i18n: true }
+          - name: specialties
+            label: Szakrendelések
+            widget: list
+            i18n: true
+            summary: '{{fields.name}}'
+            fields:
+              - { name: name, label: Név, i18n: true }
+              - { name: page, label: Hivatkozott oldal, pattern: ['^/', 'Perjellel kezdődő cím, pl. /szakrendelesek/kardiologia'], i18n: true }
+          - { name: rehabLabel, label: '„Rehabilitáció” felirata', i18n: true }
+          - { name: rehabTitle, label: '„Rehabilitáció” címe', i18n: true }
+          - { name: rehabIntro, label: '„Rehabilitáció” bevezetője', widget: text, i18n: true }
+          - name: rehab
+            label: Rehabilitációs kezelések
+            widget: list
+            i18n: true
+            summary: '{{fields.name}}'
+            fields:
+              - { name: name, label: Név, i18n: true }
+              - { name: page, label: Hivatkozott oldal, pattern: ['^/', 'Perjellel kezdődő cím, pl. /rehabilitacio/magnesterapia'], i18n: true }
+          - { name: testimonialsTitle, label: '„Vélemények” címe', i18n: true }
+          - name: testimonials
+            label: Vélemények
+            widget: list
+            i18n: true
+            field: { name: text, label: Vélemény, widget: text, i18n: true }
+
+  - name: orvosok
+    label: Orvosok
+    icon: person
+    files:
+      - name: orvosok
+        label: Orvosok
+        file: src/content/doctors.yaml
+        fields:
+          - name: rows
+            label: Orvosok
+            label_singular: orvos
+            widget: list
+            root: true
+            collapsed: true
+            allow_duplicate: false
+            summary: '{{fields.name}} – {{fields.role}}'
+            fields:
+              - name: id
+                label: Azonosító
+                pattern: ['^[a-z0-9-]+$', 'Csak kisbetű, szám és kötőjel.']
+                hint: 'Új orvosnál pl. "kovacs-anna". Meglévőt ne írjon át: a szakrendelési oldalak erre hivatkoznak.'
+              - { name: name, label: Név }
+              - { name: role, label: Szakterület }
+              - { name: photo, label: Fénykép, widget: image, required: false }
+              - { name: booking, label: Online foglalás címe, required: false, pattern: ['^https://', 'Teljes cím, https://-sel'] }
+              - { name: profile, label: Bemutatkozó oldal címe, required: false, pattern: ['^https://', 'Teljes cím, https://-sel'] }
+              - name: en
+                label: Angolul
+                widget: object
+                required: false
+                hint: Az angol oldalakon ez jelenik meg. Üresen a magyar szöveg látszik.
+                fields:
+                  - { name: role, label: Szakterület angolul }
+
+  - name: arlistaoldalak
+    label: Árlista- és kapcsolatoldalak
+    icon: list_alt
+    folder: src/content/pages/{{locale}}
+    i18n: true
+    create: false
+    delete: false
+    summary: '{{heading}}'
+    # The English pages have English addresses (/en/contact): a redirect leads there (astro.config.mjs).
+    preview_path: /{{locale}}/{{slug}}
+    fields:
+      - *title
+      - { name: description, label: Leírás a keresőknek, widget: text, i18n: true }
+      - *heading
+      - { name: lead, label: Bevezető, widget: text, required: false, i18n: true }
+      - { name: mrNote, label: Megjegyzés az MR-árakhoz, widget: text, required: false, i18n: true }
+      - { name: body, label: Szöveg, widget: richtext, required: false, i18n: true }
+
+  - name: megjegyzesek
+    label: Közös szövegek
+    icon: sticky_note_2
+    folder: src/content/notes/{{locale}}
+    i18n: true
+    create: false
+    delete: false
+    summary: '{{title}}'
+    fields:
+      - { name: title, label: Cím, i18n: true }
+      - { name: lead, label: Bevezető, required: false, i18n: true }
+      # Stored in the frontmatter, where Astro doesn't resolve image paths, so no image button.
+      - { name: summary, label: Rövid változat, widget: richtext, editor_components: [], i18n: true, hint: A vizsgálati és árlistaoldalakon ez jelenik meg. }
+      - { name: body, label: A teljes szöveg folytatása, widget: richtext, i18n: true, hint: Csak a kapcsolatoldalon jelenik meg. }
+
+  # Shown so pages can link to a booking panel; changed by a developer.
+  - name: foglalhato
+    label: Foglalható szolgáltatások
+    icon: event
+    readonly: true
+    files:
+      - name: szolgaltatasok
+        label: Foglalható szolgáltatások
+        file: src/content/booking-services.yaml
+        fields:
+          - name: rows
+            label: Szolgáltatások
+            widget: list
+            root: true
+            summary: '{{fields.name}}'
+            fields:
+              - { name: id, label: Azonosító }
+              - { name: name, label: Név }
+              - { name: note, label: Megjegyzés, required: false }
+              - { name: page, label: Oldal }
+              - name: en
+                label: Angolul
+                widget: object
+                required: false
+                fields:
+                  - { name: name, label: Név angolul }
+                  - { name: note, label: Megjegyzés angolul, required: false }

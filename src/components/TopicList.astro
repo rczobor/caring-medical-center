@@ -1,0 +1,30 @@
+---
+import { md } from '../lib/markdown';
+
+interface Props {
+  /** `text` is Markdown. */
+  items: { title: string; text: string }[];
+  /** A gold check before each title: what speaks for a service, told apart from precautions. */
+  marker?: 'check';
+}
+const { items, marker } = Astro.props;
+---
+
+<!-- Heading in a left gutter, prose to the right; stacked on phones. -->
+<dl class="mt-4 grid divide-y divide-line">
+  {
+    items.map(({ title, text }) => (
+      <div class="grid gap-x-8 gap-y-1.5 py-5 sm:grid-cols-[11rem_minmax(0,1fr)]">
+        <dt class:list={['font-bold', marker && 'flex items-start gap-2.5']}>
+          {marker === 'check' && (
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" class="mt-0.5 shrink-0 text-gold-ink">
+              <path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          )}
+          {title}
+        </dt>
+        <dd class="copy text-ink-muted" set:html={md(text)} />
+      </div>
+    ))
+  }
+</dl>

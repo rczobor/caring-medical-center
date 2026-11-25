@@ -1,0 +1,106 @@
+---
+import { getEntries } from 'astro:content';
+import BookingBar from '../components/BookingBar.astro';
+import BookingPanel from '../components/BookingPanel.astro';
+import PageHero from '../components/PageHero.astro';
+import ServiceSteps from '../components/ServiceSteps.astro';
+import TopicList from '../components/TopicList.astro';
+import ClosingCta from '../components/ClosingCta.astro';
+import Base from '../layouts/Base.astro';
+import { decisionFacts, examPath, examsOf, fromPrice, resolveBookings, serviceIn } from '../lib/catalog';
+import { localeOf } from '../lib/locale';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+const locale = localeOf(Astro.url);
+const link = await linker(locale);
+const service = await serviceIn('mr', locale);
+const overview = service.data.overview;
+if (!overview) throw new Error(`The MR service needs an overview in src/content/services.yaml (${locale})`);
+
+const exams = await Promise.all(
+  (await examsOf(service, locale)).map(async (exam) => ({ exam, rows: (await getEntries(exam.data.prices)).filter((r) => !r.data.extra) })),
+);
+const allRows = exams.flatMap((e) => e.rows);
+const bookings = await resolveBookings(service);
+---
+
+<Base bookingPanel image={service.data.image} title={overview.title} description={overview.description}>
+  <PageHero
+    breadcrumbs={[{ label: ui[locale].diagnosticsCrumb, href: link('/diagnosztika') }, { label: service.data.name }]}
+    title={service.data.name}
+    facts={decisionFacts(service, allRows, locale)}
+    image={{ src: service.data.image, alt: service.data.imageAlt }}
+  />
+
+  <div class="mx-auto grid max-w-6xl gap-14 px-4 pt-12 pb-16 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-16 lg:pb-20">
+    <aside class="order-2 lg:sticky lg:top-6 lg:order-none lg:col-start-2 lg:row-span-6 lg:row-start-1 lg:max-h-[calc(100dvh-3rem)] lg:self-start lg:overflow-y-auto">
+      <BookingPanel bookings={bookings} />
+    </aside>
+
+    <nav aria-labelledby="vizsgalatok" class="order-1 lg:col-start-1">
+      <h2 id="vizsgalatok" class="text-2xl font-semibold">{overview.examsTitle}</h2>
+      <p class="mt-2 text-ink-muted">{overview.examsIntro}</p>
+      <ul class="mt-5 grid border-t border-ink sm:grid-cols-2 sm:gap-x-8">
+        {
+          exams.map(({ exam, rows }) => (
+            <li class="link-card relative border-b border-line">
+              {/* The title is the link; its overlay makes the row the target, so a row without a price
+                  can carry its own "ask by phone" link above it (z-10), not nested in the row's. */}
+              <div class="group flex h-full min-h-12 items-center justify-between gap-4 py-2.5">
+                <a href={examPath(service, exam)} class="link-bar font-medium after:absolute after:inset-0">{exam.data.title}</a>
+                <span class="flex shrink-0 items-center gap-3">
+                  {fromPrice(rows, locale) ? (
+                    <span class="font-display text-sm font-semibold whitespace-nowrap tabular-nums">{fromPrice(rows, locale)}</span>
+                  ) : (
+                    <a href="#foglalas" class="relative z-10 -my-3 inline-flex py-3 text-sm whitespace-nowrap text-ink-muted underline decoration-ink/30 underline-offset-4 hover:text-ink">
+                      {ui[locale].facts.askByPhone}
+                    </a>
+                  )}
+                  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="text-gold-ink transition-transform group-hover:translate-x-1 motion-reduce:transition-none">
+                    <path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <section aria-labelledby="mr-rol" class="order-3 grid gap-8 lg:col-start-1">
+      {
+        overview.about.map(({ title, text }, i) => (
+          <div>
+            <h2 id={i === 0 ? 'mr-rol' : undefined} class="text-2xl font-semibold">
+              {title}
+            </h2>
+            <p class="copy mt-3">{text}</p>
+          </div>
+        ))
+      }
+    </section>
+
+    <section aria-labelledby="elonyok" class="order-4 lg:col-start-1">
+      <h2 id="elonyok" class="text-2xl font-semibold">{overview.advantagesTitle}</h2>
+      <TopicList items={overview.advantages} marker="check" />
+    </section>
+
+    <section aria-labelledby="menet" class="order-5 lg:col-start-1">
+      <ServiceSteps service={service} />
+    </section>
+
+    <section aria-labelledby="tudnivalok" class="order-6 lg:col-start-1">
+      <h2 id="tudnivalok" class="text-2xl font-semibold">{service.data.precautionsTitle}</h2>
+      <TopicList items={service.data.precautions} />
+    </section>
+
+    <section aria-labelledby="javallatok" class="order-7 lg:col-start-1">
+      <h2 id="javallatok" class="text-2xl font-semibold text-balance">{overview.indicationsTitle}</h2>
+      <TopicList items={overview.indications} />
+    </section>
+  </div>
+
+  <ClosingCta href="#foglalas" />
+  <BookingBar />
+</Base>

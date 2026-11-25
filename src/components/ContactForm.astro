@@ -1,0 +1,207 @@
+---
+// The contact form. It posts JSON to /api/kapcsolat, which worker/index.ts emails to
+// the clinic. Wherever that fails or is missing (branch previews, `astro preview`),
+// sending shows the error state with the phone number, never a fake success.
+//
+// Endpoint contract: POST /api/kapcsolat, JSON body
+//   { name, email, phone, clinic, message, consent: true, website, language }
+// `clinic` is the visitor's preferred clinic, or "" when they don't know yet.
+// `website` is a hidden spam trap: drop any submission where it isn't empty. `language`
+// is the page's ("hu" or "en"), so the clinic knows which language to answer in.
+// Answer 2xx when the message is accepted; anything else counts as a failure.
+import { getCollection } from 'astro:content';
+import { formatPhone } from '../lib/format';
+import { localeOf } from '../lib/locale';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+interface Props {
+  /** Phone number offered when sending fails. */
+  fallbackPhone: string;
+  /** A page section of its own (home): the heading in the display face beside the form from desktop width. */
+  feature?: boolean;
+}
+const { fallbackPhone, feature = false } = Astro.props;
+const clinics = (await getCollection('clinics')).sort((a, b) => a.data.position - b.data.position);
+const locale = localeOf(Astro.url);
+const t = ui[locale].form;
+const link = await linker(locale);
+const field = 'h-12 w-full rounded-md border border-ink/30 bg-paper px-4 text-base aria-[invalid=true]:border-red-700';
+---
+
+<section aria-labelledby="segitseg" class:list={['grid content-start gap-4', feature && 'lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-[auto_1fr] lg:gap-x-16']}>
+  <div>
+    <h2 id="segitseg" class:list={feature ? 'font-display text-3xl font-semibold tracking-[-0.02em] text-balance sm:text-5xl' : 'text-2xl font-semibold'}>{t.title}</h2>
+    <!-- FLAGGED A6: the 24-hour promise. -->
+    <p class:list={['text-ink-muted', feature ? 'mt-3 text-[1.0625rem]' : 'mt-2']}>{t.intro}</p>
+  </div>
+
+  <form
+    data-contact-form
+    data-phone={fallbackPhone}
+    data-phone-label={formatPhone(fallbackPhone)}
+    data-language={locale}
+    data-ui={JSON.stringify(t.script)}
+    novalidate
+    class:list={['grid gap-4 rounded-md border border-ink/20 bg-paper p-5', feature && 'border-line lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:p-7']}
+  >
+    <h3 class="text-lg font-bold">{t.heading}</h3>
+
+    <div class="grid gap-1.5">
+      <label for="kapcsolat-nev" class="font-medium">{t.name}</label>
+      <input id="kapcsolat-nev" name="name" type="text" autocomplete="name" required maxlength="120" aria-describedby="kapcsolat-nev-hiba" class={field} />
+      <p id="kapcsolat-nev-hiba" data-error class="text-sm text-red-700" hidden></p>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="grid gap-1.5">
+        <label for="kapcsolat-email" class="font-medium">{t.email}</label>
+        <input id="kapcsolat-email" name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby="kapcsolat-email-hiba" class={field} />
+        <p id="kapcsolat-email-hiba" data-error class="text-sm text-red-700" hidden></p>
+      </div>
+      <div class="grid gap-1.5">
+        <label for="kapcsolat-telefon" class="font-medium">{t.phone}</label>
+        <input id="kapcsolat-telefon" name="phone" type="tel" autocomplete="tel" required maxlength="40" aria-describedby="kapcsolat-telefon-hiba" class={field} />
+        <p id="kapcsolat-telefon-hiba" data-error class="text-sm text-red-700" hidden></p>
+      </div>
+    </div>
+
+    <!-- new: lets the clinic route the message (FLAGGED H5) -->
+    <div class="grid gap-1.5">
+      <label for="kapcsolat-rendelo" class="font-medium">{t.clinic}</label>
+      <select id="kapcsolat-rendelo" name="clinic" class={field}>
+        <option value="">{t.clinicUnknown}</option>
+        {clinics.map(({ data }) => <option>{data.name}</option>)}
+      </select>
+    </div>
+
+    <div class="grid gap-1.5">
+      <label for="kapcsolat-uzenet" class="font-medium">{t.message}</label>
+      <!-- new: data minimisation hint, wording for the data protection officer (FLAGGED E5) -->
+      <p id="kapcsolat-uzenet-tipp" class="text-sm text-ink-muted">{t.messageTip}</p>
+      <textarea
+        id="kapcsolat-uzenet"
+        name="message"
+        required
+        maxlength="3000"
+        rows="5"
+        placeholder={t.messagePlaceholder}
+        aria-describedby="kapcsolat-uzenet-tipp kapcsolat-uzenet-hiba"
+        class="w-full rounded-md border border-ink/30 bg-paper px-4 py-3 text-base aria-[invalid=true]:border-red-700"></textarea>
+      <p id="kapcsolat-uzenet-hiba" data-error class="text-sm text-red-700" hidden></p>
+    </div>
+
+    <!-- Spam trap: hidden from people and assistive tech, filled in only by bots. -->
+    <div aria-hidden="true" class="absolute -left-[9999px] h-px w-px overflow-hidden">
+      <label for="kapcsolat-weboldal">{t.website}</label>
+      <input id="kapcsolat-weboldal" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="grid gap-1.5">
+      <div class="flex items-start gap-3">
+        <input id="kapcsolat-hozzajarulas" name="consent" type="checkbox" required aria-describedby="kapcsolat-hozzajarulas-hiba" class="mt-1 size-5 shrink-0 accent-gold-ink" />
+        <!-- new: consent wording for the data protection officer (FLAGGED E5) -->
+        <label for="kapcsolat-hozzajarulas">
+          {t.consent.before}<a href={link('/adatkezelesi-tajekoztato')} class="underline underline-offset-4">{t.consent.link}</a>{t.consent.after}
+        </label>
+      </div>
+      <p id="kapcsolat-hozzajarulas-hiba" data-error class="text-sm text-red-700" hidden></p>
+    </div>
+
+    <div>
+      <button type="submit" class="inline-flex h-12 items-center rounded-full bg-gold px-6 font-bold text-ink hover:brightness-95 disabled:opacity-60">
+        {t.submit}
+      </button>
+    </div>
+    <p data-form-status role="status" class="text-sm" hidden></p>
+  </form>
+
+  <div data-form-sent tabindex="-1" class:list={['rounded-md bg-cream p-5', feature && 'lg:col-start-2 lg:row-span-2 lg:row-start-1']} hidden>
+    <p class="font-bold">{t.sentTitle}</p>
+    <p class="mt-1 text-ink-muted">{t.sentText}</p>
+  </div>
+
+  <!-- Other ways to reach the clinic (home: the clinics' numbers and e-mail): under the heading on desktop, after the form on phones. -->
+  {Astro.slots.has('default') && <div class:list={[feature && 'lg:col-start-1 lg:row-start-2']}><slot /></div>}
+</section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const sent = document.querySelector<HTMLElement>('[data-form-sent]');
+  const status = form?.querySelector<HTMLElement>('[data-form-status]');
+  // The page's language: the template sets the words on the form.
+  const words: Record<string, string> = JSON.parse(form?.dataset.ui ?? '{}');
+
+  const messages: Record<string, (el: HTMLInputElement | HTMLTextAreaElement) => string | undefined> = {
+    name: () => words.name,
+    email: (el) => (el.validity.valueMissing ? words.emailMissing : words.emailInvalid),
+    phone: () => words.phone,
+    message: () => words.message,
+    consent: () => words.consent,
+  };
+
+  function showError(el: HTMLInputElement | HTMLTextAreaElement, text: string | null) {
+    const error = document.getElementById(`${el.id}-hiba`);
+    if (!error) return;
+    error.textContent = text ?? '';
+    error.hidden = !text;
+    el.setAttribute('aria-invalid', String(Boolean(text)));
+  }
+
+  if (form && sent && status) {
+    const fields = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[required], textarea[required]')];
+    // Clear a field's error as soon as it becomes valid.
+    for (const el of fields) el.addEventListener('input', () => el.checkValidity() && showError(el, null));
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      let firstInvalid: HTMLInputElement | HTMLTextAreaElement | undefined;
+      for (const el of fields) {
+        const valid = el.checkValidity();
+        showError(el, valid ? null : (messages[el.name]?.(el) ?? words.required ?? ''));
+        if (!valid) firstInvalid ??= el;
+      }
+      if (firstInvalid) {
+        firstInvalid.focus();
+        return;
+      }
+
+      const data = new FormData(form);
+      const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      if (button) button.disabled = true;
+      status.hidden = false;
+      status.className = 'text-sm text-ink-muted';
+      status.textContent = words.sending ?? '';
+      try {
+        const response = await fetch('/api/kapcsolat', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            name: data.get('name'),
+            email: data.get('email'),
+            phone: data.get('phone'),
+            clinic: data.get('clinic'),
+            message: data.get('message'),
+            consent: data.get('consent') === 'on',
+            website: data.get('website'),
+            language: form.dataset.language,
+          }),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        form.hidden = true;
+        sent.hidden = false;
+        sent.focus();
+      } catch {
+        status.className = 'text-sm text-red-700';
+        status.textContent = '';
+        status.append(
+          words.failed ?? '',
+          Object.assign(document.createElement('a'), { href: `tel:${form.dataset.phone}`, textContent: form.dataset.phoneLabel ?? '', className: 'underline' }),
+          '.',
+        );
+      } finally {
+        if (button) button.disabled = false;
+      }
+    });
+  }
+</script>

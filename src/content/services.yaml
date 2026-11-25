@@ -1,0 +1,140 @@
+# Diagnostic services: what every exam page of a service shares.
+# Texts are verbatim from the live site (2026-11-07) unless marked "new";
+# open questions about them are marked FLAGGED (see src/content/README.md).
+- id: mr
+  name: MR vizsgálatok
+  path: /mrvizsgalat
+  image: '@assets/photos/mr-signa-elokeszites.jpg'
+  # new: alt text (the current site has none)
+  imageAlt: Radiográfus készíti elő a fejhallgatós pácienst a SIGNA Explorer MR-berendezésben
+  # Source: /arak. The site also promises 3–4 and 1 working days (FLAGGED A1).
+  resultTime: 4 munkanap
+  # Source: /movewell FAQ, "Nem, beutaló nem szükséges."
+  referral: Nem szükséges
+  # Which clinics offer it and how to book: clinics.yaml, under `booking`.
+  bookingService: mr
+  # Source: /mrvizsgalat. Step titles are new; the texts are the page's own paragraphs.
+  steps:
+    - title: Érkezés
+      text: A páciens időpontot kér a vizsgálatára, majd a vizsgálati időpontja előtt 10-15 perccel megérkezik, hogy a bejelentkező lapot kitöltse. Ezután a szakszemélyzet segítségével előkészülnek a vizsgálatra.
+    - title: A vizsgálat
+      text: A berendezésben kb. 20-30 percig kell feküdni, melyet hangulatvilágítással, igény szerint zenével teszünk komfortosabbá. Közben a radiográfusok elkészítik a szükséges méréseket. Amennyiben a vizsgálat közben más eltéréseket találnak kollégáink, úgy azt plusz mérésekkel kiegészítik. Emiatt az alap vizsgálat időtartama esetleg elhúzódhat.
+    - title: Képanyag és lelet
+      text: 'A vizsgálat után a páciens CD-n megkapja a képanyagát, a szakorvosi kiértékelést pedig e-mailben küldjük. Intézményünkben a standard leletkiadási idő: 4 munkanap.'
+  photo: '@assets/photos/mr-signa-beszelgetes.jpg'
+  # new: alt text
+  photoAlt: Munkatársunk segíti a pácienst az MR-vizsgálóasztalon a SIGNA Creator berendezésnél
+  # Source: /mrvizsgalat, "Mit kell tudni az MR-vizsgálatról?" and "Klausztrofóbia esetén".
+  precautionsTitle: Mit kell tudni az MR-vizsgálatról?
+  precautions:
+    - title: Fémek a szervezetben
+      text: Pacemaker, aneurysmaclip, gyógyszeradagoló készülékek, implantátumok/ Minden esetben egyeztetni kell a szakszemélyzettel, hogy a vizsgálat elvégezhető-e.
+    - title: Terhesség
+      text: Amennyiben a páciens állapotos, csak szakorvosi kérésre végezhető el a vizsgálat.
+    - title: Kontrasztanyag szövődmények
+      text: Egyes vizsgálatoknál szükség lehet kontrasztanyag adására a vizsgálathoz. Amennyiben előző vizsgálata során a kontrasztanyag adás után bármilyen mellékhatást tapasztalt, azt a szakszemélyzetnek jelezze. Megfelelő orvosi hátérrel az esetleges allergiás reakciót kezeljük.
+    - title: Klausztrofóbia esetén
+      text: |-
+        A klausztrofóbia a zárt vagy szűk terektől való félelem. A vizsgálatok egy kb. 60-70 cm átmérőjű, viszonylag szűk térben készülnek, azonban az MR gép mindkét vége nyitott.
+
+        A Medical Point csapata igyekszik komfortosabbá tenni a vizsgálatot a klausztrofóbiás páciensek számára is. Egyes vizsgálatoknál lehetőség van zenehallgatásra, amely enyhítheti a nagy zaj és a szűk tér okozta félelmet, illetve a páciens tud magával hozni kísérőt is, akinek jelenléte a vizsgálat során szintén nyugtatóan hathat. Minden vizsgálatnál adunk egy „pánikgombot” a páciens kezébe, amellyel tud jelezni a vizsgálat során.
+  # Its exams can need a booking deposit (src/content/notes/foglalasi-dij.md).
+  deposit: true
+  # Source: /arak. Applies to every contrast variant on the exam pages (FLAGGED G5).
+  contrastNote: A kontrasztanyaggal végzett vizsgálat kizárólag szakorvosi javaslat és előzetes vesefunkciós laboreredmény birtokában végezhető el.
+  # The overview page (/mrvizsgalat). Title and description verbatim from the live page.
+  overview:
+    title: MR Vizsgálatok – Caring Medical Center | Precíz Diagnosztika
+    description: Caring Medical Center MR vizsgálatok – sugárzásmentes, fájdalommentes képalkotás koponya, gerinc, ízületek, és lágyrészek részletes diagnosztikájához. Gyors online időpontfoglalás professzionális radiológusokkal Budapesten és Budaörsön.
+    examsTitle: MRI vizsgálatok
+    examsIntro: Nézze meg, milyen elérhető MRI vizsgálatokat nyújtunk pácienseink számára!
+    about:
+      - title: Milyen vizsgálat is az MR?
+        text: Az MR-vizsgálat vagy MRI (Magnetic Resonance Imaging) egy modern képalkotó eljárás, ahol a méréseket, képeket egy erős mágneses térben RF pulzusok segítségével készítjük. A testben lévő hidrogén protonokat gerjesztjük és mintavételezzük a vizsgálat során. Akár 3D képalkotás is lehetséges, illetve a test régiói a tér bármely irányában leképezhetők.
+      - title: Miben tér el más képalkotó vizsgálatoktól?
+        text: Az RTG és CT vizsgálatokkal szemben az MR vizsgálatok nem járnak sugárterheléssel. A legjobb kontrasztfelbontást ezen képalkotó eljárással tudjuk elérni. Ennek köszönhetően, csak az MR ad teljes képet például a pontos ízületi viszonyokról. A csontvelő ödéma már korai stádiumban is látható.
+    advantagesTitle: Az MR-vizsgálat előnyei
+    advantages:
+      # "Fájdalom- és kockázatmentes" is FLAGGED A4.
+      - title: Fájdalom- és kockázatmentes
+        text: Nincs ismert káros biológiai hatása, egymás után több MR-vizsgálat is elvégezhető
+      - title: Nincs sugárterhelés
+        text: A RTG és CT viszgálatokkal szemben az MR-vizsgálat során nincs káros sugárterhelés
+      - title: Mozgókép készítésre képes
+        text: Elengedhetetlen, ha pl. a szív részletes vizsgálatára van szükség
+      - title: 3D képalkotás is lehetséges
+        text: Kiváló képminőségben a test régiói a tér bármely irányában leképezhetők
+    indicationsTitle: Mikor ajánljuk az MR vizsgálatot és milyen vizsgálatokat végzünk?
+    indications:
+      - { title: 'Koponya, arckoponya MR', text: 'szédülés, fejfájás, fülzúgás, arcüregek gyulladása, migrénes fájdalmak esetén' }
+      - { title: 'TMJ MR /állkapocsízület/', text: 'rágási nehézség, fül körüli fájdalom esetén' }
+      - { title: 'Sella MR', text: 'agyalapi mirigy-prolaktin szint eltérés esetén' }
+      - { title: 'Nyaki lágyrész MR', text: 'nyelészavarok, légzési nehezítettség, organikus eltérések esetén' }
+      - { title: 'Nyaki gerinc MR', text: 'nyaki fájdalom, vállöv fájdalma, felső végtagok fájdalma, zsibbadása esetén' }
+      - { title: 'Háti gerinc MR', text: 'háti fájdalom, bordák felé sugárzó szúró vagy tompa fájdalom esetén' }
+      - { title: 'Ágyéki gerinc MR', text: 'derékfájdalom, farba, combba, alsó végtagokba sugárzó fájdalom zsibbadás esetén' }
+      - { title: 'Hasi MR', text: 'zsigeri panaszok, jobb bordaív alatti fájdalom esetén' }
+      - { title: 'Kismedence MR', text: 'medencetáji fájdalmak, gáttáji fájdalom, nőgyógyászati és prosztata problémák esetén' }
+      - { title: 'Ízületi MR', text: 'ízületi fájdalmak, izom, szalag és porcsérülések esetén' }
+      - { title: 'Emlő MR', text: 'emlő implantátumok állapota, bármilyen szöveti elváltozás pontosítása, műtéti tervezés esetén' }
+  en:
+    name: MRI exams
+    path: /en/mri
+    imageAlt: A radiographer prepares a patient wearing headphones in the SIGNA Explorer MRI scanner
+    resultTime: 4 working days
+    referral: Not required
+    steps:
+      - title: Arrival
+        text: Book an appointment for your exam, then arrive 10–15 minutes before your appointment time to fill in the registration form. Our staff will then help you get ready for the exam.
+      - title: The exam
+        text: You lie in the scanner for about 20–30 minutes. We make this more comfortable with mood lighting and, if you like, music. Meanwhile, the radiographers take the measurements needed. If our colleagues find other abnormalities during the exam, they add extra measurements, so the basic exam may take longer.
+      - title: Images and report
+        text: After the exam, you receive your images on a CD, and we send the specialist's report by email. Our standard time for issuing reports is 4 working days.
+    photoAlt: A member of our staff helps a patient on the MRI table of the SIGNA Creator scanner
+    precautionsTitle: What should you know about the MRI scan?
+    precautions:
+      - title: Metal in the body
+        text: Pacemakers, aneurysm clips, drug delivery devices, implants. In every case, you need to check with our staff whether the exam can be done.
+      - title: Pregnancy
+        text: If you are pregnant, the exam can only be done at a specialist's request.
+      - title: Contrast agent complications
+        text: Some exams may need a contrast agent. If you had any side effect after a contrast agent in a previous exam, tell our staff. With the right medical support on hand, we treat any allergic reaction.
+      - title: If you have claustrophobia
+        text: |-
+          Claustrophobia is the fear of closed or narrow spaces. The exams take place in a relatively narrow space, about 60–70 cm in diameter, but both ends of the MRI scanner are open.
+
+          The Medical Point team tries to make the exam more comfortable for patients with claustrophobia too. For some exams you can listen to music, which can ease the fear caused by the loud noise and the narrow space, and you can bring someone with you, whose presence during the exam can also be calming. For every exam, we give you a “panic button” to hold, so you can signal to us during the exam.
+    contrastNote: Exams with a contrast agent can only be done on a specialist's recommendation and with a prior kidney function lab result.
+    overview:
+      title: MRI scans – Caring Medical Center | Precise diagnostics
+      description: Caring Medical Center MRI scans – radiation-free, painless imaging for detailed diagnosis of the head, spine, joints and soft tissues. Fast online booking with professional radiologists in Budapest and Budaörs.
+      examsTitle: MRI exams
+      examsIntro: See which MRI exams are available to our patients!
+      about:
+        - title: What kind of exam is an MRI?
+          text: An MRI scan (magnetic resonance imaging) is a modern imaging method in which we take measurements and images in a strong magnetic field, using RF pulses. During the exam, we excite and sample the hydrogen protons in your body. Even 3D imaging is possible, and any region of the body can be imaged in any direction.
+        - title: How is it different from other imaging exams?
+          text: Unlike X-ray and CT exams, MRI scans involve no radiation exposure. This imaging method gives us the best contrast resolution. Thanks to this, only MRI gives a complete picture of, for example, the exact condition of a joint. Bone marrow edema is visible even at an early stage.
+      advantagesTitle: The advantages of an MRI scan
+      advantages:
+        - title: Painless and risk-free
+          text: It has no known harmful biological effects, and several MRI scans can be done one after another
+        - title: No radiation exposure
+          text: Unlike X-ray and CT exams, an MRI scan involves no harmful radiation
+        - title: Can capture moving images
+          text: Essential when, for example, the heart needs to be examined in detail
+        - title: 3D imaging is possible
+          text: Any region of the body can be imaged in any direction, in excellent image quality
+      indicationsTitle: When do we recommend an MRI scan, and which exams do we offer?
+      indications:
+        - { title: 'Head and facial bones MRI', text: 'For dizziness, headache, ringing in the ears, sinus inflammation and migraine pain' }
+        - { title: 'TMJ (jaw joint) MRI', text: 'For difficulty chewing and pain around the ear' }
+        - { title: 'Sella MRI', text: 'For abnormal pituitary function or prolactin levels' }
+        - { title: 'Neck soft tissue MRI', text: 'For swallowing problems, difficulty breathing and organic abnormalities' }
+        - { title: 'Cervical spine MRI', text: 'For neck pain, pain in the shoulder girdle, and pain or numbness in the arms' }
+        - { title: 'Thoracic spine MRI', text: 'For mid-back pain and sharp or dull pain radiating toward the ribs' }
+        - { title: 'Lumbar spine MRI', text: 'For lower back pain, and pain or numbness radiating to the buttocks, thighs and legs' }
+        - { title: 'Abdominal MRI', text: 'For complaints of the abdominal organs and pain below the right rib cage' }
+        - { title: 'Pelvic MRI', text: 'For pain in the pelvic or perineal area, and gynecological and prostate problems' }
+        - { title: 'Joint MRI', text: 'For joint pain and muscle, ligament and cartilage injuries' }
+        - { title: 'Breast MRI', text: 'To check the condition of breast implants, to clarify any tissue change, and for surgical planning' }

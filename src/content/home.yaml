@@ -1,0 +1,114 @@
+title: Caring Medical Center | Gyors MR, CT & Röntgen Diagnosztika – Budapest
+description: Caring Medical Center Magyarországon modern MR, CT, és röntgen diagnosztikai vizsgálatokkal biztosít gyors, pontos és professzionális egészségügyi diagnózist tapasztalt radiológusokkal, online időpontfoglalással.
+heading: Gyors, pontos vizsgálatok emberközeli gondoskodással
+lead: A legmodernebb eszközökkel és szakértő orvosokkal gondoskodunk egészségéről.
+image: '@assets/photos/recepcio.jpg'
+helpTitle: Miben segíthetünk?
+helpIntro: Válassza ki, mi fáj, és megmutatjuk, melyik vizsgálat, szakorvos és kezelés segíthet.
+complaints:
+  - name: Fáj a térde?
+    text: Térdizületi MR, ortopédia, gyógytorna
+    page: /panaszok/terdfajdalom
+  - name: Fáj a háta, a dereka vagy a nyaka?
+    text: Gerinc MR, gerincgyógyászat, gyógytorna
+    page: /panaszok/hat-derek-es-nyakfajdalom
+  - name: Fáj a válla?
+    text: Vállízületi MR, ortopédia, lökéshullám-terápia
+    page: /panaszok/vallfajdalom
+  - name: Fáj a keze vagy a csuklója?
+    text: Csukló MR, kézsebészet, gyógytorna
+    page: /panaszok/kez-es-csuklofajdalom
+  - name: Fáj a feje, vagy gyakran szédül?
+    text: Fejfájáscenter, neurológia, koponya-MR
+    page: /panaszok/fejfajas-es-szedules
+  - name: Megsérült sportolás közben?
+    text: Traumatológus, sürgős MR, rehabilitáció
+    page: /panaszok/sportserules
+shortcuts:
+  - name: Már van lelete?
+    text: Radiológiai másodvélemény
+    page: /medreport
+  - name: Kell-e beutaló?
+    text: Felkészülés, lelet és fizetés
+    page: /paciensinformaciok
+  - name: Orvosaink
+    text: Szakorvosaink szakterület szerint
+    page: /orvosaink
+diagnosticsTitle: Diagnosztika
+diagnostics:
+  - title: MRI vizsgálatok
+    text: Többnyire a betegek szakorvosi javaslatra érkeznek MRI vizsgálatra, azonban nálunk beutaló nélkül, akár hétvégén is indikálható a vizsgálat. Kérdése merült fel? Forduljon hozzánk bizalommal.
+    page: /mrvizsgalat
+    prices: mr
+  # new: FLAGGED H11
+  - title: CT vizsgálatok
+    text: CT-vizsgálat a Caring Medical Budában, online időpontfoglalással.
+    page: /ct-vizsgalatok
+    prices: ct
+  - title: Röntgenvizsgálatok
+    text: A Caring Medical Centerben használt digitális röntgenberendezés már a legújabb technológiának megfelelő páciensbarát eszköz, amely kevesebb terheléssel jár a szervezet számára.
+    page: /rontgenvizsgalat
+    prices: rtg
+  - title: Laborvizsgálatok
+    text: A laborvizsgálatok segítenek a szervezet működésének pontos feltérképezésében, legyen szó rutinvizsgálatról vagy célzott diagnosztikáról. Nálunk gyorsan, kényelmesen és előzetes beutaló nélkül is elvégeztethetők a leggyakoribb vér-, vizelet- és hormonvizsgálatok. Kérdése van? Forduljon hozzánk bizalommal!
+    page: /laborvizsgalatok
+  - title: Ultrahang
+    text: Az ultrahangvizsgálat fájdalommentes, gyors és pontos módszer a belső szervek, ízületek és erek állapotának vizsgálatára. Korszerű készülékeinkkel azonnali képet kaphat egészségi állapotáról, akár beutaló nélkül is. Keressen minket bizalommal időpontért!
+    page: /ultrahang
+aboutTitle: Rehabilitációs, Diagnosztikai és Orvosi központ
+aboutText: Célunk az amatőr és profi sportolók, valamint a magánszemélyek mozgásszervi állapotának pontos diagnosztikája és célzott kezelése. Korszerű vizsgálati módszerekkel feltárjuk a mozgásszervi panaszok okait, elemezzük a terhelhetőséget és a sérüléskockázatot. A diagnosztikai eredményekre építve személyre szabott gyógytorna- és fizikoterápiás programokat állítunk össze, amelyek elősegítik a hatékony regenerációt, a fájdalomcsillapítást és a mozgásfunkciók helyreállítását. Integrált szemléletünkkel nemcsak a gyógyulást támogatjuk, hanem hozzájárulunk a megelőzéshez is.
+stats:
+  - value: 16+
+    label: Szakrendelés
+    text: Sokrétű és összehangolt szolgáltatásokkal biztosítjuk a gyógyulását
+  - value: 20+
+    label: Szakember
+    text: Szakembereink professzionális, komplex és személyre szabott kezeléseket biztosítanak a vendégek számára
+  - value: 45 000+
+    label: Elégedett páciens
+    text: Évente több száz sportoló és magánember gyógyulását segítjük elő
+specialtiesTitle: Orvosi szakrendelések
+specialtiesIntro: Az orvosi szakrendeléseink sokoldalú lehetőséget kínálnak, hogy a páciensek magas színvonalú ellátást kapjanak. A Caring Medical Center egy helyen, igényes környezetben biztosítja a gyógyulás további lehetőségeit kiváló szakemberei és a legkorszerűbb gépek segítségével.
+specialties:
+  - name: Sürgősségi ellátás
+    page: /szakrendelesek/surgossegi
+  - name: Idegsebészet
+    page: /szakrendelesek/idegsebeszet
+  - name: Traumatológia és Sportsebészet
+    page: /szakrendelesek/ortopedia-traumatologia-sportsebeszet
+  - name: Reumatológia
+    page: /szakrendelesek/reumatologia
+  - name: Kardiológia és Sportkardiológia
+    page: /szakrendelesek/kardiologia
+  - name: Neurológia
+    page: /szakrendelesek/neurologia
+  - name: Kézsebészet
+    page: /szakrendelesek/kezsebeszet
+  - name: Természetgyógyászat
+    page: /szakrendelesek/termeszetgyogyaszat-fitoterapia
+rehabLabel: Alternatív Terápiák
+rehabTitle: Rehabilitáció és egészségmegőrzés
+rehabIntro: Elkötelezettek vagyunk az életminőség javítása mellett, és a legjobb szolgáltatást nyújtjuk diagnosztikában, orvosi ellátásban és rehabilitációban.
+rehab:
+  - name: Mágnesterápia
+    page: /rehabilitacio/magnesterapia
+  - name: Kinezió-tape kezelés
+    page: /rehabilitacio/kinezio-tape-kezeles
+  - name: Lökéshullám Terápia
+    page: /rehabilitacio/lokeshullam-terapia
+  - name: Masszázsterápia
+    page: /rehabilitacio/masszazsterapia
+  - name: Gyógytorna
+    page: /rehabilitacio/gyogytorna-fizikoterapia
+  - name: Lézeres Kezelés
+    page: /rehabilitacio/lezeres-kezeles
+testimonialsTitle: Mit Mondanak Pácienseink
+testimonials:
+  - Nagyon elégedett vagyok a rendelő szolgáltatásaival. MR-vizsgálaton jártam itt, és már az időpont egyeztetése is gyors és zökkenőmentes volt
+  - Barátságos a légkör, és tiszta modern a környezet nagyon kellemes illattal 🙂 Egyetlen időpontomnál sem volt csúszás. Szívből ajánlom
+  - Egy hónap alatt 8-10 mágneses és néhány lézerterápián vettem részt, melyeknek eredményeképpen teljesen felépültem és egészséges lett újra a combom
+  - Vérprofi csapata van Szekér Zolinak, le a kalappal mindenki előtt.🫡👏
+  - 4 hét után már fájdalommentesen tudok létezni a mindennapokban és hamarosan újra edzés is jöhet
+  - Több alkalommal jártam a Medical Pointban. Mindig gyorsak és segítőkészek voltak. Vizsgálat után hatékony kezeléseket kaptam.
+  - Az MR vizsgálatot végző hölgy rendkívül kedves,mindenre kiterjedő felvilágosítást adott.Precízség,pontosság, kedvesség
+  - Rendkívül gyorsak és segítőkészek voltak velem. Mindig ide fogok járni MR vizsgálatra. Mindkét alkalommal előbb készült el a leletem

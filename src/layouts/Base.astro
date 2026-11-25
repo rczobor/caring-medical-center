@@ -1,0 +1,110 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Font, getImage } from 'astro:assets';
+import fallbackPhoto from '../assets/photos/recepcio.jpg';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { localeOf, pagePath } from '../lib/locale';
+import { toJsonLd } from '../lib/structured-data';
+import { counterpart } from '../lib/translations';
+import { ui } from '../lib/ui';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /**
+   * The page has its own booking panel (#foglalas) and a fixed phone booking bar:
+   * the header's booking button jumps to the panel, and the footer stays clear of the bar.
+   */
+  bookingPanel?: boolean;
+  /** The photo a shared link shows: the page's own when it can fill the preview, else the reception. */
+  image?: ImageMetadata | undefined;
+  /** "article" for news; everything else is a "website" page. */
+  type?: 'website' | 'article';
+  /** schema.org entities describing the page (src/lib/structured-data.ts). */
+  structuredData?: object[] | undefined;
+  /** Whether site search (/kereses) can find the page. Off for the 404 and the search page itself. */
+  searchable?: boolean;
+  /** The footer lists every clinic; a page that already shows the clinic cards (home) leaves them out. */
+  footerClinics?: boolean;
+}
+
+const { title, description, bookingPanel = false, image, type = 'website', structuredData, searchable = true, footerClinics = true } = Astro.props;
+const path = pagePath(Astro.url);
+const canonical = new URL(path, Astro.site);
+const locale = localeOf(Astro.url);
+const t = ui[locale];
+// The same page in the other language, for search engines and the header's language link.
+const translated = await counterpart(path, locale);
+const alternates = translated
+  ? [
+      { lang: locale, href: canonical },
+      { lang: t.otherLanguage.hreflang, href: new URL(translated, Astro.site) },
+    ]
+  : [];
+// 1200×630 is the size Facebook, LinkedIn and messaging apps crop link previews to. Sharp
+// never enlarges, so a smaller photo would ship uncropped and smaller than the tags say.
+const shareSource = image && image.width >= 1200 && image.height >= 630 ? image : fallbackPhoto;
+const shareImage = new URL((await getImage({ src: shareSource, width: 1200, height: 630, fit: 'cover', format: 'jpeg' })).src, Astro.site);
+// Previews and staging must never be indexed; only the production build opts in.
+const indexable = import.meta.env.PUBLIC_INDEXABLE === 'true';
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alternates.map(({ lang, href }) => <link rel="alternate" hreflang={lang} href={href} />)}
+    {/* Hungarian is the site's own language, so it is the default for every other one. */}
+    {alternates.length > 0 && <link rel="alternate" hreflang="x-default" href={locale === 'hu' ? canonical : alternates[1]!.href} />}
+    {!indexable && <meta name="robots" content="noindex, nofollow" />}
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="Caring Medical Center" />
+    <meta property="og:locale" content={locale === 'hu' ? 'hu_HU' : 'en_US'} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    {structuredData && <script type="application/ld+json" is:inline set:html={toJsonLd(structuredData)} />}
+    <!-- The live site's icon, ported as-is; favicon.ico and the touch icon are rendered from it. -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <Font cssVariable="--font-source-sans" preload={[{ style: 'normal' }]} />
+    <Font cssVariable="--font-instrument" />
+    {/*
+      The page-to-page opt-in is inline, not in global.css: Chrome drops the transition when
+      the page finishes parsing before the stylesheet arrives. That happens on pages without a
+      module script; a module script holds parsing back until the CSS is in. The animation
+      itself is styled in global.css.
+    */}
+    <style is:inline>
+      @media (prefers-reduced-motion: no-preference) {
+        @view-transition {
+          navigation: auto;
+        }
+      }
+    </style>
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a
+      href="#tartalom"
+      class="sr-only rounded bg-ink px-4 py-2 text-paper focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50"
+    >
+      {t.skipToContent}
+    </a>
+    <SiteHeader inPageBooking={bookingPanel} otherLanguage={translated ?? (locale === 'hu' ? '/en' : '/')} />
+    <main id="tartalom" class="flex-1" data-pagefind-body={searchable || undefined}>
+      <slot />
+    </main>
+    <SiteFooter clinics={footerClinics} bookingBar={bookingPanel} />
+  </body>
+</html>

@@ -1,0 +1,689 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, getEntry } from 'astro:content';
+import ClinicMap from '../components/ClinicMap.astro';
+import ContactForm from '../components/ContactForm.astro';
+import Photo from '../components/Photo.astro';
+import Base from '../layouts/Base.astro';
+import { lowestPrice } from '../lib/catalog';
+import { formatDays, formatPhone } from '../lib/format';
+import { inLocale, localeOf, localId, localize } from '../lib/locale';
+import { clinic, organization } from '../lib/structured-data';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+import { photoTransition } from '../lib/view-transition';
+import logo from '../assets/logo.svg';
+// The hero: the clinic's reception, from the live site's full-resolution original.
+import heroPhoto from '../assets/photos/recepcio-hd.jpg';
+import atrium from '../assets/photos/buda-atrium.jpg';
+import lounge from '../assets/photos/point-varo.jpg';
+
+// The homepage in either language: home.yaml or en/home.yaml.
+const locale = localeOf(Astro.url);
+const t = ui[locale];
+const link = await linker(locale);
+const home = (await getEntry('home', localId('home', locale)))?.data;
+if (!home) throw new Error(`Missing src/content/${localId('home', locale)}.yaml`);
+const examPrices = await getCollection('prices', (p) => !p.data.extra);
+const lowestFor = (category: string | undefined) => category && lowestPrice(examPrices.filter((p) => p.data.category === category), locale);
+const clinics = (await getCollection('clinics')).sort((a, b) => a.data.position - b.data.position);
+// What can be booked online at each clinic, in the order the contact page lists the services.
+const bookingServices = (await getCollection('bookingServices')).sort((a, b) => a.data.position - b.data.position);
+const offeredAt = (clinic: (typeof clinics)[number]['data']) =>
+  bookingServices.filter((s) => clinic.booking.some((b) => b.service.id === s.id)).map((s) => localize(s, locale));
+// A diagnostics or clinic card shows the photo its page opens with, so the two always match
+// and the photo moves from the card into the page (photoTransition).
+const services = await getCollection('services');
+// Shared data names Hungarian paths; link() gives this locale's page.
+const sitePages = await getCollection('site', inLocale(locale));
+const sitePageFor = (page: string) => sitePages.find((p) => `/${p.id}` === link(page))?.data;
+const photoFor = (page: string) => services.find((s) => link(s.data.path) === link(page))?.data.image ?? sitePageFor(page)?.image;
+/** An opening-hours note ("closed on public holidays") in the page's language. */
+const noteOf = (h: (typeof clinics)[number]['data']['hours'][number]) => (locale === 'en' ? (h.en?.note ?? h.note) : h.note);
+const [leadQuote, ...quotes] = home.testimonials;
+// How many of the other quotes a phone shows before "More reviews".
+const phoneQuotes = 3;
+
+
+// The first screen's proof: the "from" prices the price index (/arak) leads with, under its labels,
+// so a price change shows here too. Only the exam lists; rehabilitation lives further down.
+const diagnosticsCategories: (string | undefined)[] = home.diagnostics.map((d) => d.prices);
+const diagnosticsRank = (category: string) => {
+  const rank = diagnosticsCategories.indexOf(category);
+  return rank === -1 ? Infinity : rank;
+};
+const priceFacts = (sitePageFor('/arak')?.fromPrices ?? [])
+  .filter((f) => f.category !== 'rehab')
+  // In the order Diagnosztika lists them; any exam it doesn't list comes last.
+  .sort((a, b) => diagnosticsRank(a.category) - diagnosticsRank(b.category))
+  .flatMap((f) => {
+    const amount = lowestFor(f.category);
+    return amount ? [{ label: f.label, amount, page: link(f.page) }] : [];
+  })
+
+
+const chevron = 'M6 3l5 5-5 5';
+/** The text up to its first full stop, question or exclamation mark. */
+const firstSentence = (text: string) => text.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? text;
+// Two heading levels: a band opens with the larger; the paired columns (specialties, therapies) share the smaller.
+// ContactForm's `feature` heading matches bandTitle.
+const bandTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-balance sm:text-5xl';
+const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-balance sm:text-4xl';
+---
+
+<Base
+  title={home.title}
+  description={home.description}
+  image={home.image}
+  footerClinics={false}
+  structuredData={[organization(Astro.site!, logo.src), ...clinics.map((c) => clinic({ ...c, data: { ...c.data, page: link(c.data.page) } }, Astro.site!))]}
+>
+  <!--
+    The reading room: a dim green-ink room where the image is the light. The photo is a lit
+    panel, edge to edge at the top on phones and running to the window's right edge on desktop,
+    with a gold line where its light meets the room; that line is the page's signature.
+  -->
+  <section aria-labelledby="fooldal-cim" class="hero relative isolate overflow-hidden bg-night text-cream">
+    <div class="relative h-[13.5rem] sm:h-80 lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[44%]">
+      <Photo
+        src={heroPhoto}
+        alt={t.home.heroAlt}
+        widths={[480, 720, 960, 1280, 1600, 2000, 2400]}
+        sizes="(min-width: 1024px) 44vw, 100vw"
+        loading="eager"
+        fetchpriority="high"
+        class="size-full bg-night-raised object-cover object-[50%_47%] lg:object-[50%_40%]"
+        {/* The strip at its narrowest: a 320 px phone over the strip's 13.5rem. */}
+        crop={{ below: 1024, aspect: 320 / 216, position: '50% 47%', sizes: '100vw' }}
+      />
+      <span aria-hidden="true" class="light absolute inset-x-0 bottom-0 h-[3px] bg-gold lg:inset-x-auto lg:inset-y-0 lg:left-0 lg:h-auto lg:w-[3px]"></span>
+    </div>
+    <div class="mx-auto max-w-6xl px-4 pt-6 pb-6 sm:pt-8 lg:py-20">
+      <div class="lg:w-[52%] lg:pr-6">
+        <h1 id="fooldal-cim" class="font-display text-[clamp(2.25rem,6vw,4.75rem)] leading-[0.98] font-semibold tracking-[-0.035em] text-balance">{home.heading}</h1>
+        <p class="mt-4 max-w-[30rem] text-lg text-mist sm:mt-5 sm:text-xl">{home.lead}</p>
+        <div class="mt-6 flex flex-wrap gap-3 sm:mt-7">
+          <a href="#diagnosztika" class="inline-flex h-11 items-center rounded-full bg-gold px-6 font-bold text-ink hover:brightness-105">{t.home.exams}</a>
+          <a href={link('/arak')} class="inline-flex h-11 items-center rounded-full border-[1.5px] border-cream/60 px-6 font-bold hover:border-cream">{t.home.prices}</a>
+        </div>
+        {
+          priceFacts.length > 0 && (
+            <dl class="mt-6 grid grid-cols-3 gap-x-4 border-t border-cream/15 pt-4 sm:mt-9 sm:pt-5">
+              {priceFacts.map(({ label, amount, page }) => (
+                <div class="link-card group relative grid content-start gap-1">
+                  {/* Each figure opens its price list; the label's link covers the whole item. */}
+                  {/* The link cue sits by the label at every width; there is no room beside the figure on phones. */}
+                  <dt class="flex items-center gap-1 text-sm text-mist">
+                    <a href={page} class="after:absolute after:-inset-y-2 after:inset-x-0">{label}</a>
+                    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" class="chev">
+                      <path d={chevron} />
+                    </svg>
+                  </dt>
+                  <dd class="font-display text-sm leading-tight font-semibold whitespace-nowrap text-gold tabular-nums min-[22.5rem]:text-base min-[25rem]:text-lg sm:text-2xl">
+                    {/* English "from" goes on a small line of its own: beside the figure, three of them don't fit. */}
+                    {t.priceFrom.before && <span class="block font-sans text-xs font-normal text-mist sm:text-sm">{t.priceFrom.before}</span>}
+                    <span class="link-bar">{amount}{t.priceFrom.after}</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Patients who know only what hurts start here; each complaint page leads from exam to specialist to treatment. -->
+  <section id="panaszok" aria-labelledby="panaszok-cim" class="mx-auto max-w-6xl scroll-mt-4 px-4 pt-6 pb-14 sm:pt-12 lg:pt-16">
+    <!-- The questions that aren't about pain ("Már van lelete?"…) follow the complaints as a lighter row, three across on desktop. -->
+    <div class="grid gap-x-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+      <div class="lg:row-span-2">
+        <h2 id="panaszok-cim" class={bandTitle}>{home.helpTitle}</h2>
+        <p class="mt-3 max-w-[26rem] text-ink-muted">{home.helpIntro}</p>
+      </div>
+      <ul class="rows mt-5 grid border-t-2 border-ink sm:grid-cols-2 sm:gap-x-8 lg:col-start-2 lg:row-start-1 lg:mt-0">
+        {
+          home.complaints.map(({ name, text, page }) => (
+            <li class="link-card relative border-b border-line">
+              {/* The name is the link, so it is also the link's accessible name; its overlay makes the whole row the target. */}
+              <div class="row group">
+                <span>
+                  <a href={link(page)} class="link-bar text-lg leading-snug font-bold after:absolute after:inset-0">{name}</a>
+                  <span class="block text-ink-muted">{text}</span>
+                </span>
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="chev">
+                  <path d={chevron} />
+                </svg>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        home.shortcuts.length > 0 && (
+          <ul class="rows mt-8 grid border-t-2 border-ink sm:grid-cols-3 sm:gap-x-8 lg:col-start-2 lg:row-start-2">
+            {home.shortcuts.map(({ name, text, page }) => (
+              <li class="link-card relative border-b border-line">
+                <div class="row top group">
+                  <span>
+                    <a href={link(page)} class="link-bar text-lg leading-snug font-bold after:absolute after:inset-0">{name}</a>
+                    <span class="block text-ink-muted">{text}</span>
+                  </span>
+                  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="chev">
+                    <path d={chevron} />
+                  </svg>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </section>
+
+  <!--
+    Diagnostics as a lit list: the services with their "from" price, and beside them on desktop
+    the photo of the one under the pointer or focus, like a film on a light box. Phones show the
+    rows alone. The plate rules below cover five rows.
+  -->
+  <section id="diagnosztika" aria-labelledby="diagnosztika-cim" class="lightbox scroll-mt-4 bg-night text-cream">
+    <div class="mx-auto grid max-w-6xl gap-x-14 px-4 py-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:py-20">
+      <div>
+        <h2 id="diagnosztika-cim" class={bandTitle}>{home.diagnosticsTitle}</h2>
+        <ul class="mt-8 border-t border-cream/20">
+          {
+            home.diagnostics.map((d) => {
+              const price = lowestFor(d.prices);
+              return (
+                <li class="diag link-card relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 border-b border-cream/20 py-4 lg:py-6">
+                  {/* Last baseline: the price lines up with the title on its figure, below English "from". */}
+                  <div class="flex flex-wrap items-baseline-last justify-between gap-x-4 gap-y-0.5">
+                    <h3 class="font-display text-xl font-semibold sm:text-2xl lg:text-[1.75rem]">
+                      <!-- The title link covers the row, so the whole row is one target named by the service. -->
+                      <a href={link(d.page)} class="link-bar after:absolute after:inset-0">
+                        {d.title}
+                      </a>
+                    </h3>
+                    {
+                      price ? (
+                        <p class="font-display text-lg font-semibold whitespace-nowrap text-gold tabular-nums sm:text-xl">
+                          {t.priceFrom.before && <span class="block font-sans text-xs font-normal text-mist sm:text-sm">{t.priceFrom.before}</span>}
+                          {price}{t.priceFrom.after}
+                        </p>
+                      ) : (
+                        // No catalog price: "ask by phone" leads to the clinics' call buttons. It sits above the
+                        // title link's overlay (z-10), a link of its own, not one nested in the row's.
+                        <a href="#rendeloink" class="relative z-10 -my-3 inline-flex py-3 text-sm whitespace-nowrap text-mist underline decoration-mist/50 underline-offset-4 hover:text-cream">
+                          {t.facts.askByPhone}
+                        </a>
+                      )
+                    }
+                  </div>
+                  {/* Without a price the right edge belongs to the phone link: no chevron, but its slot is kept so the link ends where the prices do. */}
+                  {
+                    price ? (
+                      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="chev row-span-2 text-gold lg:row-span-1">
+                        <path d={chevron} />
+                      </svg>
+                    ) : (
+                      <span aria-hidden="true" class="row-span-2 block w-4 lg:row-span-1"></span>
+                    )
+                  }
+                  {/* The teaser's first sentence from tablet width, so the prices step evenly; on phones the name and price carry the row. The page has the rest. */}
+                  <p class="copy col-start-1 mt-1.5 hidden max-w-[32rem] text-mist sm:block">{firstSentence(d.text)}</p>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+      <!-- A lit panel like the hero's: square corners and the gold line of light on its edge. -->
+      <div aria-hidden="true" class="plates relative hidden aspect-[4/3] self-start lg:sticky lg:top-8 lg:mt-20 lg:block">
+        <span class="absolute inset-y-0 left-0 z-10 w-[3px] bg-gold"></span>
+        {
+          home.diagnostics.map((d, i) => {
+            const photo = photoFor(d.page);
+            return (
+              photo && (
+                <Image
+                  src={photo}
+                  alt=""
+                  widths={[720, 1080, 1440]}
+                  {/* A 4:3 panel, close to the photos' own 3:2, so nothing is cropped hard; it stays beside the rows while they scroll. */}
+                  sizes="(min-width: 1024px) 720px, 100vw"
+                  data-plate={i}
+                  class="plate absolute inset-0 size-full bg-night-raised object-cover"
+                  style={photoTransition(photo)}
+                />
+              )
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="rendeloink" data-clinic-group class="bg-cream">
+    <div class="mx-auto max-w-6xl px-4 py-14 lg:py-20">
+      <h2 id="rendeloink" class={bandTitle}>{t.home.clinics}</h2>
+      <div class="mt-7">
+        <ClinicMap clinics={clinics} />
+      </div>
+      <ul class="mt-8 grid gap-8 md:grid-cols-3">
+        {
+          clinics.map(({ id, data: clinic }) => {
+            const clinicPage = sitePageFor(clinic.page);
+            return (
+              <li data-clinic={id} class="flex flex-col gap-3">
+                {clinicPage?.image && (
+                  <Photo
+                    src={clinicPage.image}
+                    alt={clinicPage.imageAlt}
+                    widths={[360, 540, 720]}
+                    sizes="(min-width: 768px) 360px, 100vw"
+                    class="aspect-[5/2] w-full bg-line object-cover md:aspect-[3/2]"
+                    style={photoTransition(clinicPage.image)}
+                    {/* Phones show a 5:2 band of the 3:2 photo, from its middle. */}
+                    crop={{ below: 768, aspect: 5 / 2, position: '50% 50%', sizes: 'calc(100vw - 2rem)' }}
+                  />
+                )}
+                <h3 class="font-display text-xl font-semibold">
+                  <a href={link(clinic.page)} class="link-bar">
+                    {clinic.name}
+                  </a>
+                </h3>
+                {/* new: FLAGGED H12 */}
+                <p class="text-sm">
+                  <span class="font-semibold">{t.page.bookableHere} </span>
+                  {offeredAt(clinic).map((service, i) => (
+                    <>
+                      {i > 0 && ', '}
+                      <a href={link(service.data.page)} class="underline decoration-ink/30 underline-offset-4 hover:decoration-ink">{service.data.name}</a>
+                    </>
+                  ))}
+                </p>
+                <div class="text-ink-muted">
+                  <p>
+                    {clinic.address.postalCode} {clinic.address.city}, <span class="whitespace-nowrap">{clinic.address.street}</span>
+                  </p>
+                  <p class="text-sm">
+                    {/* One line per day range; a time range never breaks. */}
+                    {clinic.hours.map((h) => (
+                      <span class="block">
+                        {formatDays(h.days, locale)}: <span class="whitespace-nowrap tabular-nums">{h.opens}–{h.closes}</span>
+                        {noteOf(h) && ` (${noteOf(h)})`}
+                      </span>
+                    ))}
+                  </p>
+                </div>
+                {/* The actions line up across the cards, whatever the length of the hours above. */}
+                <p class="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2">
+                  <a
+                    href={`tel:${clinic.phone}`}
+                    aria-label={t.call(formatPhone(clinic.phone), clinic.name)}
+                    class="inline-flex h-11 min-w-[10.5rem] items-center justify-center rounded-full border-[1.5px] border-ink/60 px-4 font-bold whitespace-nowrap tabular-nums hover:border-ink"
+                  >
+                    {formatPhone(clinic.phone)}
+                  </a>
+                  <a href={link(`${clinic.page}#foglalas`)} aria-label={`${t.clinicPanel.title}, ${clinic.name}`} class="inline-flex min-h-11 items-center underline underline-offset-4">
+                    {t.clinicPanel.title}
+                  </a>
+                </p>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!--
+    Cinematic: the Buda centre's skylit atrium fills the band's right side (the top on phones),
+    its light falling off into the night colour where the text and figures sit.
+  -->
+  <section aria-labelledby="rolunk" class="relative isolate overflow-hidden bg-night text-cream">
+    <div class="relative -z-10 h-72 sm:h-96 lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[56%]">
+      <Image
+        src={atrium}
+        alt=""
+        widths={[480, 720, 960, 1280, 1600, 2000]}
+        sizes="(min-width: 1024px) 56vw, 100vw"
+        class="size-full bg-night-raised object-cover object-[55%_40%]"
+      />
+      <span aria-hidden="true" class="cine-fade absolute inset-0"></span>
+    </div>
+    <div class="mx-auto -mt-20 max-w-6xl px-4 pb-14 sm:-mt-32 lg:mt-0 lg:py-24">
+      <div class="grid gap-y-8 lg:w-[50%] lg:gap-y-10">
+        <h2 id="rolunk" class={bandTitle}>{home.aboutTitle}</h2>
+        <p class="copy text-cream/90 max-lg:order-2">{home.aboutText}</p>
+        <!-- In each item the label comes first in the markup, as a definition list requires; the figure is shown first: above its label on phones, beside it from tablet width. -->
+        <dl class="grid content-start gap-x-8 divide-y sm:grid-cols-[auto_minmax(0,1fr)] divide-cream/15 border-t-2 border-gold max-lg:order-1">
+          {
+            home.stats.map(({ value, label, text }) => (
+              <div class="grid py-5 sm:col-span-2 sm:grid-cols-subgrid">
+                <dt class="font-bold sm:col-start-2">{label}</dt>
+                {/* The figure counts up when it comes into view (script below). The hidden copy holds the final width, so the label never shifts; screen readers get the plain value. */}
+                <dd class="order-first mb-2 grid font-display sm:order-none sm:col-start-1 sm:row-span-2 sm:row-start-1 sm:mb-0 text-4xl leading-none font-semibold tracking-[-0.03em] whitespace-nowrap text-gold tabular-nums sm:text-5xl">
+                  <span class="sr-only">{value}</span>
+                  <span aria-hidden="true" class="invisible col-start-1 row-start-1">{value}</span>
+                  <span aria-hidden="true" data-count={value} class="col-start-1 row-start-1">{value}</span>
+                </dd>
+                <dd class="text-mist sm:col-start-2">{text}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <div>
+    <!-- The two columns share one grid (subgrid rows: heading, intro, list), so their rules line up; the therapy photo spans both. -->
+    <div class="mx-auto grid max-w-6xl gap-y-14 px-4 py-14 lg:grid-cols-2 lg:grid-rows-[auto_auto_auto] lg:gap-x-16 lg:gap-y-0 lg:py-20">
+      <section aria-labelledby="szakrendelesek" class="lg:row-span-3 lg:grid lg:grid-rows-subgrid">
+        <div class="self-end">
+          <h2 id="szakrendelesek" class={pairTitle}>{home.specialtiesTitle}</h2>
+        </div>
+        <p class="copy mt-4 text-ink-muted">{home.specialtiesIntro}</p>
+        <ul class="rows mt-6 grid self-start border-t-2 border-ink sm:grid-cols-2 sm:gap-x-8">
+          {
+            home.specialties.map(({ name, page }) => (
+              <li class="border-b border-line">
+                <a href={link(page)} class="row group font-medium">
+                  <span class="link-bar">{name}</span>
+                  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="chev">
+                    <path d={chevron} />
+                  </svg>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section aria-labelledby="rehabilitacio" class="lg:row-span-3 lg:grid lg:grid-rows-subgrid">
+        <div class="self-end">
+          <p class="font-medium text-gold-ink">{home.rehabLabel}</p>
+          <h2 id="rehabilitacio" class:list={[pairTitle, 'mt-1']}>{home.rehabTitle}</h2>
+        </div>
+        <p class="copy mt-4 text-ink-muted">{home.rehabIntro}</p>
+        <ul class="rows mt-6 grid self-start border-t-2 border-ink sm:grid-cols-2 sm:gap-x-8">
+          {
+            home.rehab.map(({ name, page }) => (
+              <li class="border-b border-line">
+                <a href={link(page)} class="row group font-medium">
+                  <span class="link-bar">{name}</span>
+                  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="chev">
+                    <path d={chevron} />
+                  </svg>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <!--
+    Cinematic: the Point clinic's waiting lounge fades in behind the heading and the lead quote,
+    as if the patients were speaking from the room; the other quotes sit on the plain night colour.
+  -->
+  <section aria-labelledby="velemenyek" class="relative isolate overflow-hidden bg-night text-cream">
+    <div class="relative -z-10 h-72 sm:h-96 lg:absolute lg:top-0 lg:right-0 lg:h-[29rem] lg:w-[58%]">
+      <Image
+        src={lounge}
+        alt=""
+        widths={[480, 720, 960, 1280, 1600, 2000]}
+        sizes="(min-width: 1024px) 58vw, 100vw"
+        class="size-full bg-night-raised object-cover object-[45%_55%]"
+      />
+      <span aria-hidden="true" class="cine-fade to-floor absolute inset-0"></span>
+    </div>
+    <div class="mx-auto -mt-20 max-w-6xl px-4 pb-16 sm:-mt-32 lg:mt-0 lg:py-24">
+      <h2 id="velemenyek" class={bandTitle}>{home.testimonialsTitle}</h2>
+      <!-- The first quote leads, under a hanging opening mark in the page's language; the editor's order decides which. -->
+      {
+        leadQuote && (
+          <blockquote class="relative mt-10 max-w-5xl pl-12 sm:pl-24 lg:max-w-[52%]">
+            <span aria-hidden="true" class="absolute -top-[0.45em] left-0 font-display text-[5rem] leading-none font-semibold text-gold sm:text-[8rem]">{t.home.quote.open}</span>
+            <p class="font-display text-2xl leading-[1.2] font-medium tracking-[-0.02em] text-balance sm:text-[2.25rem]">{leadQuote}{t.home.quote.close}</p>
+          </blockquote>
+        )
+      }
+      <!-- Phones show three quotes and keep the rest one tap away; wider screens show them all, in balanced columns so none is left alone on a row. -->
+      <ul class="mt-14 grid gap-y-8 sm:block sm:columns-2 sm:gap-x-10 lg:columns-3">
+        {
+          quotes.map((quote, i) => (
+            <li class:list={['border-t border-gold/70 pt-4 sm:mb-8 sm:break-inside-avoid', i >= phoneQuotes && 'max-sm:hidden']}>
+              <blockquote class="text-lg text-cream/90">
+                <p>{t.home.quote.open}{quote}{t.home.quote.close}</p>
+              </blockquote>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        quotes.length > phoneQuotes && (
+          <details data-pagefind-ignore class="group mt-8 sm:hidden">
+            {/* new: FLAGGED H10 */}
+            <summary class="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 font-bold text-gold [&::-webkit-details-marker]:hidden">
+              {t.home.moreQuotes(quotes.length - phoneQuotes)}
+              <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="chev rotate-90 group-open:-rotate-90">
+                <path d={chevron} />
+              </svg>
+            </summary>
+            <ul class="mt-6 grid gap-y-8">
+              {quotes.slice(phoneQuotes).map((quote) => (
+                <li class="border-t border-gold/70 pt-4">
+                  <blockquote class="text-lg text-cream/90">
+                    <p>{t.home.quote.open}{quote}{t.home.quote.close}</p>
+                  </blockquote>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )
+      }
+    </div>
+  </section>
+
+  <div class="bg-cream">
+    <div class="mx-auto max-w-6xl px-4 py-16 lg:py-20">
+      <ContactForm fallbackPhone={clinics[0]!.data.phone} feature>
+        <!-- The footer leaves its clinic blocks out on home, so the clinics' e-mail addresses live here. -->
+        <ul class="mt-6 grid divide-y divide-line border-t-2 border-ink lg:mt-8">
+          {
+            clinics.map(({ data: clinic }) => (
+              <li class="py-4">
+                <p class="font-display text-lg font-semibold">{clinic.name}</p>
+                {/* Call button, then the e-mail on its own line, the same for every clinic whatever the address length. */}
+                <p class="mt-2 flex flex-col items-start gap-1">
+                  <a
+                    href={`tel:${clinic.phone}`}
+                    aria-label={t.call(formatPhone(clinic.phone), clinic.name)}
+                    class="inline-flex h-11 min-w-[10.5rem] items-center justify-center rounded-full border-[1.5px] border-ink/60 px-4 font-bold whitespace-nowrap tabular-nums hover:border-ink"
+                  >
+                    {formatPhone(clinic.phone)}
+                  </a>
+                  <a href={`mailto:${clinic.email}`} class="inline-flex min-h-11 items-center underline underline-offset-4">{clinic.email}</a>
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+      </ContactForm>
+    </div>
+  </div>
+</Base>
+
+<style>
+  /* One row-link pattern for every list of pages on home: name (and a line under it), a chevron, a hairline. */
+  .row {
+    display: flex;
+    height: 100%;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.75rem;
+  }
+  /* Rows side by side whose sub-lines may wrap keep their titles on one line. */
+  .row.top {
+    align-items: flex-start;
+  }
+  .row.top .chev {
+    margin-top: 0.25rem;
+  }
+  .chev {
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    color: var(--color-gold-ink);
+    transition: translate 200ms ease-out;
+  }
+  .lightbox .chev,
+  .hero .chev,
+  section.bg-night .chev {
+    color: var(--color-gold);
+  }
+  .group:is(:hover, :focus-visible, :focus-within) .chev {
+    translate: 0.25rem 0;
+  }
+
+  /* On the dark bands focus rings and the hover bar use the brand gold, which reads there. */
+  .hero :focus-visible,
+  .lightbox :focus-visible,
+  section.bg-night :focus-visible {
+    outline-color: var(--color-gold);
+  }
+
+  /*
+   * The light box: the first service's plate shows until another row is hovered or focused.
+   * Each plate fades; nothing moves, so it reads as a light switching, not a slide.
+   */
+  .plate {
+    opacity: 0;
+    transition: opacity 320ms ease-out;
+  }
+  /* No row active: the first plate. A row active: only its own (the rules after this). */
+  .lightbox:not(:has(.diag:hover, .diag:focus-within)) [data-plate='0'],
+  .lightbox:has(.diag:nth-child(1):is(:hover, :focus-within)) [data-plate='0'],
+  .lightbox:has(.diag:nth-child(2):is(:hover, :focus-within)) [data-plate='1'],
+  .lightbox:has(.diag:nth-child(3):is(:hover, :focus-within)) [data-plate='2'],
+  .lightbox:has(.diag:nth-child(4):is(:hover, :focus-within)) [data-plate='3'],
+  .lightbox:has(.diag:nth-child(5):is(:hover, :focus-within)) [data-plate='4'] {
+    opacity: 1;
+  }
+  .diag {
+    transition: background-color 200ms ease-out;
+  }
+  .diag:is(:hover, :focus-within) {
+    background-color: color-mix(in srgb, var(--color-cream) 4%, transparent);
+  }
+  .diag:is(:hover, :focus-within) .chev {
+    translate: 0.25rem 0;
+  }
+
+  /*
+   * A cinematic band: the photo's light falls off into the night colour, downward on phones,
+   * leftward from desktop. `.to-floor` also fades it out fully at the bottom, where content
+   * continues below the photo (testimonials).
+   */
+  .cine-fade {
+    background: linear-gradient(to bottom, transparent 50%, color-mix(in srgb, var(--color-night) 70%, transparent) 75%, var(--color-night) 97%);
+  }
+  @media (min-width: 64rem) {
+    .cine-fade {
+      background:
+        linear-gradient(to right, var(--color-night) 0%, color-mix(in srgb, var(--color-night) 70%, transparent) 12%, color-mix(in srgb, var(--color-night) 20%, transparent) 30%, transparent 45%),
+        linear-gradient(to bottom, color-mix(in srgb, var(--color-night) 35%, transparent) 0%, transparent 20%, transparent 80%, color-mix(in srgb, var(--color-night) 45%, transparent) 100%);
+    }
+    .cine-fade.to-floor {
+      background:
+        linear-gradient(to right, var(--color-night) 0%, color-mix(in srgb, var(--color-night) 70%, transparent) 14%, color-mix(in srgb, var(--color-night) 20%, transparent) 32%, transparent 48%),
+        linear-gradient(to bottom, color-mix(in srgb, var(--color-night) 30%, transparent) 0%, transparent 18%, transparent 55%, var(--color-night) 100%);
+    }
+  }
+  /* The page's one orchestrated moment: the gold line of light draws along the photo once, on load. */
+  @media (prefers-reduced-motion: no-preference) {
+    .light {
+      transform-origin: left;
+      animation: light-x 1100ms cubic-bezier(0.45, 0, 0.15, 1) 200ms both;
+    }
+    @media (min-width: 64rem) {
+      .light {
+        transform-origin: top;
+        animation-name: light-y;
+      }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .plate,
+    .chev,
+    .diag {
+      transition: none;
+    }
+  }
+  @keyframes light-x {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @keyframes light-y {
+    from {
+      transform: scaleY(0);
+    }
+  }
+</style>
+
+<script>
+  // Count each figure up from zero the first time it is fully on screen, keeping its prefix,
+  // suffix and digit grouping ("45 000+"). Without the script, or with reduced motion, the
+  // final figure simply stands.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const duration = 1400;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // The first callback, and some engines' entry callbacks, fire on any overlap: check the ratio.
+        for (const { target, intersectionRatio } of entries) {
+          if (intersectionRatio < 0.99 || !(target instanceof HTMLElement)) continue;
+          observer.unobserve(target);
+          const format = formatter(target.dataset.count!);
+          const start = performance.now();
+          const tick = (now: number) => {
+            const t = Math.min((now - start) / duration, 1);
+            // The last frame is the source text exactly, whatever its grouping.
+            target.textContent = t < 1 ? format(1 - (1 - t) ** 4) : target.dataset.count!;
+            if (t < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      },
+      // Not 1: at some zoom levels the ratio never quite reaches it.
+      { threshold: 0.99 },
+    );
+    for (const el of document.querySelectorAll<HTMLElement>('[data-count]')) {
+      const format = formatter(el.dataset.count!);
+      el.textContent = format(0);
+      observer.observe(el);
+    }
+  }
+
+  /** "45 000+" → (progress 0…1) → "0+" … "45 000+". */
+  function formatter(final: string) {
+    const match = final.match(/^(\D*)(\d[\d\s]*\d|\d)(\D*)$/);
+    if (!match) return () => final;
+    const [, prefix = '', number = '', suffix = ''] = match;
+    const separator = number.match(/\s/)?.[0];
+    const target = Number(number.replace(/\s/g, ''));
+    return (progress: number) => {
+      const digits = String(Math.round(target * progress));
+      const grouped = separator ? digits.replace(/\B(?=(\d{3})+$)/g, separator) : digits;
+      return prefix + grouped + suffix;
+    };
+  }
+</script>

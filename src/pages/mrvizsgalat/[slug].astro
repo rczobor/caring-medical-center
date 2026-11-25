@@ -1,0 +1,12 @@
+---
+import type { InferGetStaticPropsType } from 'astro';
+import { examPaths } from '../../lib/catalog';
+import MriExam from '../../templates/MriExam.astro';
+
+export const getStaticPaths = () => examPaths('mr', 'hu');
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+const { exam } = Astro.props;
+---
+
+<MriExam exam={exam} />

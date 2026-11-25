@@ -1,0 +1,14 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import PriceListPage from '../components/PriceListPage.astro';
+import { localeOf, localId } from '../lib/locale';
+import { ui } from '../lib/ui';
+
+const locale = localeOf(Astro.url);
+const t = ui[locale].priceList.ct;
+const page = await getEntry('pages', localId('ct-arak', locale));
+if (!page) throw new Error(`Missing src/content/pages/${localId('ct-arak', locale)}.md`);
+const rows = (await getCollection('prices', (p) => p.data.category === 'ct')).sort((a, b) => a.data.position - b.data.position);
+---
+
+<PriceListPage page={page} breadcrumb={t.crumb} searchable sections={[{ id: 'ct', title: t.ct, rows }]} />

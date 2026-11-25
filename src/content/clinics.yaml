@@ -1,0 +1,51 @@
+# Source: footer and clinic pages of the live site, extracted 2026-11-07.
+# Phone numbers are pending confirmation (FLAGGED E1). `otherPhone` is the
+# second number the live contact page lists for each clinic, unlabelled there.
+# `booking` comes from the live /kapcsolat-<clinic> pages. A clinic's photo is the `image`
+# of its `page` (src/content/site), so the home card and the page it opens show the same one.
+- id: point
+  name: Caring Medical Point
+  address: { street: Madarász Viktor u. 47-49., postalCode: '1138', city: Budapest }
+  phone: '+3618009771'
+  email: info@medicalpoint.hu
+  geo: { lat: 47.55412350595159, lng: 19.07947808659173 }
+  hours:
+    - { days: [Mo, Tu, We, Th, Fr], opens: '08:00', closes: '20:00' }
+    - { days: [Sa], opens: '08:00', closes: '16:00', note: a pontos idő változhat, en: { note: exact hours may vary } }
+  otherPhone: '+3618009772'
+  page: /medicalpoint-bemutato
+  booking:
+    - { service: mr, system: Medicall, url: 'https://medicall.cc/idopontfoglalas/medicalpoint/specializations?qualificationId=90065' }
+    - { service: rontgen, system: Medicall, url: 'https://medicall.cc/idopontfoglalas/medicalpoint/specializations?qualificationId=99134' }
+    - { service: labor, system: WhiteLab, url: 'https://whitelab.hu/idopontfoglalas' }
+    - { service: magnes, system: Medicall, url: 'https://medicall.cc/idopontfoglalas/medicalpoint/specializations?qualificationId=40290' }
+
+- id: buda
+  name: Caring Medical Buda
+  address: { street: Zsigmond tér 10., postalCode: '1023', city: Budapest }
+  phone: '+36703431912'
+  email: info@caringmedical.hu
+  geo: { lat: 47.52461515776167, lng: 19.0363433665347 }
+  hours:
+    - { days: [Mo, Tu, We, Th, Fr], opens: '08:00', closes: '20:00' }
+  otherPhone: '+36302013360'
+  page: /caringmedical-buda-bemutato
+  booking:
+    - { service: mr, system: Medicall, url: 'https://medicall.cc/idopontfoglalas/caring-medical-center/specializations?qualificationId=90065' }
+    - { service: ct, system: Medicall, url: 'https://medicall.cc/idopontfoglalas/caring-medical-center/specializations?qualificationId=90036' }
+    - { service: emlo, system: Medicall, url: 'https://medicall.cc/idopontfoglalas/caring-medical-center/doctors?specializationId=97050,10102684' }
+    - { service: rontgen, system: Medicall, url: 'https://medicall.cc/idopontfoglalas/caring-medical-center/specializations?qualificationId=99134' }
+
+- id: budaors
+  name: Caring Medical Budaörs
+  address: { street: Puskás Tivadar út 8., postalCode: '2040', city: Budaörs }
+  phone: '+36306329522'
+  email: budaors@caringmedical.hu
+  geo: { lat: 47.4570183016996, lng: 18.936081654886156 }
+  hours:
+    - { days: [Mo, Tu, We, Th, Fr], opens: '08:00', closes: '20:00' }
+  otherPhone: '+3618998591'
+  page: /budaorsi-bemutato
+  booking:
+    - { service: mr, system: MyMedio, url: 'https://caring-medical-budaors.mymedio.hu/specializations?qualificationId=90065' }
+    - { service: magnes, system: Medicall, url: 'https://medicall.cc/idopontfoglalas/caring-medical-budaors/doctors?doctorId=428841' }

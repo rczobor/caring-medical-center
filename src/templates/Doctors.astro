@@ -1,0 +1,97 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, getEntries, getEntry } from 'astro:content';
+import ClosingCta from '../components/ClosingCta.astro';
+import PageHero from '../components/PageHero.astro';
+import Base from '../layouts/Base.astro';
+import { localeOf, localId, localize, siteSections } from '../lib/locale';
+import { ui } from '../lib/ui';
+
+const locale = localeOf(Astro.url);
+const t = ui[locale];
+const page = await getEntry('pages', localId('orvosaink', locale));
+if (!page) throw new Error(`Missing src/content/pages/${localId('orvosaink', locale)}.md`);
+
+// A specialty page lists its doctors, so the directory follows the specialties. A doctor
+// in two specialties appears under both, the way patients look for them.
+const section = locale === 'hu' ? 'szakrendelesek/' : `en/${siteSections['szakrendelesek']}/`;
+const specialties = (await getCollection('site', (p) => p.id.startsWith(section) && !!p.data.doctors?.length)).sort((a, b) =>
+  a.data.heading.localeCompare(b.data.heading, locale),
+);
+const groups = await Promise.all(
+  specialties.map(async (p) => ({
+    id: p.id.split('/').at(-1)!,
+    page: `/${p.id}`,
+    heading: p.data.heading,
+    doctors: (await getEntries(p.data.doctors!)).map((d) => localize(d, locale)),
+  })),
+);
+// Doctors on no specialty page still belong in the directory.
+const listed = new Set(groups.flatMap((g) => g.doctors.map((d) => d.id)));
+const others = (await getCollection('doctors')).filter((d) => !listed.has(d.id)).map((d) => localize(d, locale));
+if (others.length) groups.push({ id: 'tovabbi-orvosaink', page: '', heading: t.doctors.others, doctors: others });
+---
+
+<Base title={page.data.title} description={page.data.description}>
+  <PageHero eyebrow={t.doctorsTitle} title={page.data.heading}>
+    {page.data.lead && <p class="mt-4 max-w-[40rem] text-lg text-mist">{page.data.lead}</p>}
+  </PageHero>
+
+  <!-- One row per specialty, its name left of its doctors on wide screens. -->
+  <div class="mx-auto max-w-6xl divide-y divide-line px-4 pt-6 pb-16 lg:pb-20">
+    {
+      groups.map(({ id, page: href, heading, doctors }) => (
+        <section id={id} aria-labelledby={`${id}-cim`} class="grid scroll-mt-4 gap-4 py-8 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-10">
+          <h2 id={`${id}-cim`} class="text-xl leading-snug font-semibold text-balance">
+            {href ? (
+              <a href={href} class="link-bar">
+                {heading}
+              </a>
+            ) : (
+              heading
+            )}
+          </h2>
+          <ul class="grid gap-x-8 gap-y-6 sm:grid-cols-2 xl:grid-cols-3">
+            {doctors.map(({ data }) => (
+              <li class="grid grid-cols-[5.5rem_minmax(0,1fr)] content-start gap-x-4">
+                {/* The name says who it is, so the portrait is decorative. */}
+                {data.photo ? (
+                  <Image
+                    src={data.photo}
+                    alt=""
+                    widths={[88, 176]}
+                    sizes="88px"
+                    class="row-span-3 aspect-square w-full rounded-md bg-line object-cover object-top"
+                  />
+                ) : (
+                  <span class="row-span-3" />
+                )}
+                <h3 class="self-end leading-snug font-bold">
+                  {data.profile ? (
+                    <a href={data.profile} class="underline decoration-ink/30 underline-offset-4 hover:decoration-ink">
+                      {data.name}
+                    </a>
+                  ) : (
+                    data.name
+                  )}
+                </h3>
+                <p class="text-sm leading-snug text-ink-muted">{data.role}</p>
+                {data.booking && (
+                  <a
+                    href={data.booking}
+                    aria-label={t.bookOnlineAt(data.name)}
+                    class="mt-3 inline-flex h-11 items-center justify-self-start rounded-full bg-gold px-5 text-sm font-bold text-ink hover:brightness-95"
+                  >
+                    {t.bookOnline}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+
+  <ClosingCta />
+</Base>

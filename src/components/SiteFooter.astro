@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import { formatHours } from '../lib/format';
+import { localeOf } from '../lib/locale';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+interface Props {
+  /** List each clinic's address, numbers and hours. Off where the page already shows them. */
+  clinics?: boolean;
+  /** The page has a fixed phone booking bar: the footer keeps its height free, in the footer's gold. */
+  bookingBar?: boolean;
+}
+const { clinics: showClinics = true, bookingBar = false } = Astro.props;
+const locale = localeOf(Astro.url);
+const t = ui[locale];
+const link = await linker(locale);
+const clinics = (await getCollection('clinics')).sort((a, b) => a.data.position - b.data.position);
+---
+
+<footer class:list={['bg-gold text-ink', bookingBar && 'pb-[4.75rem] lg:pb-0']}>
+  {showClinics && (
+  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
+    {
+      clinics.map(({ id, data }) => (
+        <section aria-labelledby={`footer-${id}`}>
+          <h2 id={`footer-${id}`} class="font-sans text-lg font-bold tracking-normal">
+            <a href={link(data.page)} class="hover:underline">{data.name}</a>
+          </h2>
+          <address class="mt-2 space-y-1 not-italic">
+            <p>{data.address.postalCode} {data.address.city}, {data.address.street}</p>
+            <p><a href={`mailto:${data.email}`} class="underline">{data.email}</a></p>
+          </address>
+          <ul class="mt-2 text-sm">
+            {data.hours.map((h) => (
+              <li>
+                {formatHours(h, locale)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+  )}
+  <div class:list={[showClinics && 'border-t border-ink/15']}>
+    <nav aria-label={t.footer.nav} class="mx-auto flex max-w-6xl flex-wrap gap-x-6 gap-y-2 px-4 py-4 text-sm">
+      {
+        t.footer.links.map(({ href, label }) => (
+          <a href={link(href)} class="underline">
+            {label}
+          </a>
+        ))
+      }
+      <span class="sm:ml-auto">© {new Date().getFullYear()} Caring Medical Center</span>
+    </nav>
+  </div>
+</footer>

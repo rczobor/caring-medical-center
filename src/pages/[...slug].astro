@@ -1,0 +1,218 @@
+---
+import { getCollection, getEntries, getEntry, render } from 'astro:content';
+import BookingBar from '../components/BookingBar.astro';
+import BookingPanel from '../components/BookingPanel.astro';
+import ClinicPanel from '../components/ClinicPanel.astro';
+import ClosingCta from '../components/ClosingCta.astro';
+import DoctorPanel from '../components/DoctorPanel.astro';
+import MoreNews from '../components/MoreNews.astro';
+import PageHero from '../components/PageHero.astro';
+import PriceLedger from '../components/PriceLedger.astro';
+import StepList from '../components/StepList.astro';
+import TopicList from '../components/TopicList.astro';
+import Base from '../layouts/Base.astro';
+import { bookingsFor, fromPrice, fromPriceOfPage } from '../lib/catalog';
+import { describe } from '../lib/describe';
+import { formatDate, formatHours } from '../lib/format';
+import { localeOf, localize, sectionId } from '../lib/locale';
+import { nav, parentOf } from '../lib/nav';
+import { article, clinic as clinicData } from '../lib/structured-data';
+import { counterpart, linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+// Every page in src/content/site, served at its id: its file path, or for an English page
+// the path under /en (sitePageId). Pages with their own template (src/pages/*.astro) take
+// precedence over this catch-all.
+export async function getStaticPaths() {
+  return (await getCollection('site')).map((page) => ({ params: { slug: page.id }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const { data } = page;
+const locale = localeOf(Astro.url);
+const t = ui[locale];
+const link = await linker(locale);
+const { Content } = await render(page);
+const bookings = data.bookingService ? await bookingsFor(data.bookingService.id) : [];
+const prices = data.prices
+  ? (await getCollection('prices', (p) => p.data.category === data.prices?.category)).sort((a, b) => a.data.position - b.data.position)
+  : [];
+const doctors = data.doctors ? await getEntries(data.doctors) : [];
+const examPrices = data.fromPrices ? await getCollection('prices', (p) => !p.data.extra) : [];
+const fromPrices = (data.fromPrices ?? []).map((f) => ({ ...f, page: link(f.page), price: fromPrice(examPrices.filter((p) => p.data.category === f.category), locale) }));
+const pathway = await Promise.all(
+  (data.pathway ?? []).map(async (step) => ({
+    ...step,
+    links: await Promise.all(step.links.map(async (l) => ({ ...l, page: link(l.page), price: await fromPriceOfPage(link(l.page), locale) }))),
+  })),
+);
+const newsSection = `${sectionId('hirek', locale)}/`;
+const isNews = page.id.startsWith(newsSection);
+// An article's aside holds the three newest other articles.
+const moreNews = isNews
+  ? (await getCollection('site', (e) => e.id.startsWith(newsSection) && e.id !== page.id))
+      .flatMap((e) => (e.data.date ? [{ ...e, date: e.data.date }] : []))
+      .sort((a, b) => b.date.getTime() - a.date.getTime())
+      .slice(0, 3)
+  : [];
+// A clinic's own page carries its details and online booking in a panel (clinics.yaml),
+// which names the Hungarian page: an English page finds its clinic through that.
+const huPath = locale === 'hu' ? `/${page.id}` : await counterpart(`/${page.id}`, locale);
+const clinicEntry = (await getCollection('clinics')).find((c) => c.data.page === huPath);
+const clinic = clinicEntry && { ...clinicEntry.data, page: `/${page.id}` };
+const clinicBookings = clinic
+  ? await Promise.all(
+      clinic.booking.map(async ({ service, url }) => {
+        const entry = await getEntry(service);
+        if (!entry) throw new Error(`clinics.yaml: unknown booking service ${service.id}`);
+        return { service: localize(entry, locale).data, url };
+      }),
+    )
+  : [];
+const aside = bookings.length > 0 || prices.length > 0 || doctors.length > 0 || moreNews.length > 0 || clinic !== undefined;
+// Doctors bookable online, or a clinic's panel, are the page's booking panel, as on exam pages.
+const doctorBooking = bookings.length === 0 && doctors.some((d) => d.data.booking);
+const clinicBooking = clinicBookings.length > 0;
+const bookingPanel = bookings.length > 0 || doctorBooking || clinicBooking;
+const parent = parentOf(`/${page.id}`, locale);
+// Under a section the eyebrow ("Röntgenvizsgálatok") names the page in the breadcrumbs;
+// on a top-level page it stays above the heading.
+const breadcrumbs = parent && [parent, { label: data.eyebrow ?? data.heading }];
+const site = Astro.site!;
+const structuredData = clinicEntry && clinic
+  ? [clinicData({ ...clinicEntry, data: clinic }, site)]
+  : isNews && data.date
+    ? [article({ title: data.heading, date: data.date, url: new URL(`/${page.id}`, site), image: data.image && new URL(data.image.src, site).href }, site)]
+    : undefined;
+---
+
+<Base
+  title={data.title}
+  description={data.description ?? describe(page.body ?? '', data.heading)}
+  bookingPanel={bookingPanel}
+  image={data.image}
+  type={isNews ? 'article' : 'website'}
+  structuredData={structuredData}
+>
+  <PageHero
+    breadcrumbs={breadcrumbs}
+    eyebrow={parent ? undefined : data.eyebrow}
+    title={data.heading}
+    image={data.image && { src: data.image, alt: data.imageAlt }}
+    short={nav[locale].some((item) => item.href === `/${page.id}`)}
+  >
+    {
+      // A clinic's hero says where it is, when it is open and what can be booked there (FLAGGED H12),
+      // as its home card does; calls and online booking stay in the panel.
+      clinic && (
+        <>
+          <p class="mt-5 text-lg">
+            {clinic.address.postalCode} {clinic.address.city}, {clinic.address.street}
+          </p>
+          <ul class="mt-1 text-mist">
+            {clinic.hours.map((h) => <li>{formatHours(h, locale)}</li>)}
+          </ul>
+          <p class="mt-4 max-w-[32rem] text-mist">
+            <span class="font-semibold text-cream">{t.page.bookableHere} </span>
+            {clinicBookings.map(({ service }, i) => (
+              <>
+                {i > 0 && ', '}
+                <a href={link(service.page)} class="underline decoration-mist/50 underline-offset-4 hover:text-cream">{service.name}</a>
+              </>
+            ))}
+          </p>
+        </>
+      )
+    }
+    {
+      data.date && (
+        <p class="mt-4 text-mist">
+          <time datetime={data.date.toISOString().slice(0, 10)}>{formatDate(data.date, locale)}</time>
+        </p>
+      )
+    }
+  </PageHero>
+
+  <div
+    class:list={[
+      'mx-auto grid max-w-6xl gap-14 px-4 pt-12 pb-16 lg:pb-20',
+      aside && 'lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-16',
+    ]}
+  >
+    <div class="min-w-0">
+      {
+        fromPrices.length > 0 && (
+          <ul aria-label={t.page.fromPrices} class="mb-10 grid border-t border-ink sm:grid-cols-2 sm:gap-x-8">
+            {fromPrices.map(({ label, page, price }) => (
+              <li class="border-b border-line">
+                <a href={page} class="group flex h-full min-h-12 items-center justify-between gap-4 py-3">
+                  <span>
+                    <span class="link-bar font-bold">{label}</span>
+                    {price && <span class="block whitespace-nowrap text-ink-muted tabular-nums">{price}</span>}
+                  </span>
+                  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="shrink-0 text-gold-ink transition-transform group-hover:translate-x-1 motion-reduce:transition-none">
+                    <path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      <div class="copy"><Content /></div>
+      {
+        pathway.length > 0 && (
+          <section aria-labelledby="lepesek" class="mt-14 max-w-3xl">
+            <h2 id="lepesek" class="text-2xl font-semibold">
+              {t.page.pathway}
+            </h2>
+            <StepList steps={pathway} />
+          </section>
+        )
+      }
+      {
+        data.faq && (
+          <section aria-labelledby="gyik" class="mt-14 max-w-3xl">
+            <h2 id="gyik" class="text-2xl font-semibold">
+              {data.faq.title}
+            </h2>
+            <TopicList items={data.faq.items.map(({ question, answer }) => ({ title: question, text: answer }))} />
+          </section>
+        )
+      }
+      {
+        isNews && (
+          <p class="mt-12 max-w-[36rem] border-t border-line pt-6">
+            <a href={link('/hirek')} class="font-bold text-gold-ink underline underline-offset-4">
+              <span aria-hidden="true">←</span> {t.page.backToNews}
+            </a>
+          </p>
+        )
+      }
+    </div>
+    {
+      aside && (
+        <aside class="grid content-start gap-8 lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:self-start lg:overflow-y-auto">
+          {data.prices && prices.length > 0 && (
+            <section aria-labelledby="arak">
+              <h2 id="arak" class="text-xl font-semibold">
+                {data.prices.title}
+              </h2>
+              <div class="mt-4">
+                <PriceLedger rows={prices} />
+              </div>
+            </section>
+          )}
+          {bookings.length > 0 && <BookingPanel bookings={bookings} />}
+          {doctors.length > 0 && <DoctorPanel doctors={doctors} note={data.doctorsNote} booking={doctorBooking} />}
+          {moreNews.length > 0 && <MoreNews articles={moreNews} />}
+          {clinic && <ClinicPanel clinic={clinic} bookings={clinicBookings} />}
+        </aside>
+      )
+    }
+  </div>
+
+  {bookingPanel && <BookingBar />}
+  {/* Every page ends with the band; on a clinic's page that clinic is listed first. */}
+  <ClosingCta href={bookings.length || clinicBooking || doctorBooking ? '#foglalas' : link('/kapcsolat')} first={clinicEntry?.id} />
+</Base>
