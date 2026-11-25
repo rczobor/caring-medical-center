@@ -36,7 +36,7 @@ const LAYERS: Layer[] = [
   { kind: 'clump', n: 22, rMin: 2.6, rMax: 4, vMin: 108, vMax: 148, aMin: 0.55, aMax: 0.85, slant: 16, fMin: 1, fMax: 2.4, wind: 1, tumble: true, settle: true },
   // No blurred near-flakes (Weather has a few): on the green-black band they read as smudges.
 ];
-/** The mockup's "medium": 70% of Weather's density, to spare battery. */
+/** 70% of Weather's density, to spare battery. */
 const DENSITY = 0.7;
 const BASE_AREA = 390 * 844;
 const VARIANTS = 10;
