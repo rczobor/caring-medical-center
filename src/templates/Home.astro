@@ -3,6 +3,8 @@ import { Image } from 'astro:assets';
 import { getCollection, getEntry } from 'astro:content';
 import ClinicMap from '../components/ClinicMap.astro';
 import ContactForm from '../components/ContactForm.astro';
+import HolidayDecor from '../components/HolidayDecor.astro';
+import HolidayTree from '../components/HolidayTree.astro';
 import Photo from '../components/Photo.astro';
 import Base from '../layouts/Base.astro';
 import { lowestPrice } from '../lib/catalog';
@@ -84,6 +86,7 @@ const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-b
     with a gold line where its light meets the room; that line is the page's signature.
   -->
   <section aria-labelledby="fooldal-cim" class="hero relative isolate overflow-hidden bg-night text-cream">
+    <HolidayDecor />
     <div class="relative h-[13.5rem] sm:h-80 lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[44%]">
       <Photo
         src={heroPhoto}
@@ -97,18 +100,20 @@ const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-b
         crop={{ below: 1024, aspect: 320 / 216, position: '50% 47%', sizes: '100vw' }}
       />
       <span aria-hidden="true" class="light absolute inset-x-0 bottom-0 h-[3px] bg-gold lg:inset-x-auto lg:inset-y-0 lg:left-0 lg:h-auto lg:w-[3px]"></span>
+      <HolidayTree />
     </div>
-    <div class="mx-auto max-w-6xl px-4 pt-6 pb-6 sm:pt-8 lg:py-20">
+    <div class="hero-copy mx-auto max-w-6xl px-4 pt-6 pb-6 sm:pt-8 lg:py-20">
       <div class="lg:w-[52%] lg:pr-6">
-        <h1 id="fooldal-cim" class="font-display text-[clamp(2.25rem,6vw,4.75rem)] leading-[0.98] font-semibold tracking-[-0.035em] text-balance">{home.heading}</h1>
-        <p class="mt-4 max-w-[30rem] text-lg text-mist sm:mt-5 sm:text-xl">{home.lead}</p>
-        <div class="mt-6 flex flex-wrap gap-3 sm:mt-7">
+        <h1 id="fooldal-cim" data-snow-quiet class="font-display text-[clamp(2.25rem,6vw,4.75rem)] leading-[0.98] font-semibold tracking-[-0.035em] text-balance">{home.heading}</h1>
+        <p data-snow-quiet class="mt-4 max-w-[30rem] text-lg text-mist sm:mt-5 sm:text-xl">{home.lead}</p>
+        <div data-snow-quiet class="mt-6 flex flex-wrap gap-3 sm:mt-7">
           <a href="#diagnosztika" class="inline-flex h-11 items-center rounded-full bg-gold px-6 font-bold text-ink hover:brightness-105">{t.home.exams}</a>
           <a href={link('/arak')} class="inline-flex h-11 items-center rounded-full border-[1.5px] border-cream/60 px-6 font-bold hover:border-cream">{t.home.prices}</a>
         </div>
+        {/* In season, snowflakes settle on the .perch rule and fade behind data-snow-quiet copy (lib/snow.ts). */}
         {
           priceFacts.length > 0 && (
-            <dl class="mt-6 grid grid-cols-3 gap-x-4 border-t border-cream/15 pt-4 sm:mt-9 sm:pt-5">
+            <dl data-snow-quiet class="perch mt-6 grid grid-cols-3 gap-x-4 border-t border-cream/15 pt-4 sm:mt-9 sm:pt-5">
               {priceFacts.map(({ label, amount, page }) => (
                 <div class="link-card group relative grid content-start gap-1">
                   {/* Each figure opens its price list; the label's link covers the whole item. */}
@@ -604,6 +609,20 @@ const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-b
       background:
         linear-gradient(to right, var(--color-night) 0%, color-mix(in srgb, var(--color-night) 70%, transparent) 14%, color-mix(in srgb, var(--color-night) 20%, transparent) 32%, transparent 48%),
         linear-gradient(to bottom, color-mix(in srgb, var(--color-night) 30%, transparent) 0%, transparent 18%, transparent 55%, var(--color-night) 100%);
+    }
+  }
+  /*
+   * In the Christmas season the copy sits above the snow (z-1) and below the snowbank (z-3). Only
+   * then: out of season a positioned layer would change how the browser smooths its text.
+   */
+  :global(:root[data-season='christmas']) .hero-copy {
+    position: relative;
+    z-index: 2;
+  }
+  /* In the Christmas season, below desktop width, the snowbank needs room under the price figures. */
+  @media (max-width: 63.99rem) {
+    :global(:root[data-season='christmas']) .hero-copy {
+      padding-bottom: 2.5rem;
     }
   }
   /* The page's one orchestrated moment: the gold line of light draws along the photo once, on load. */
