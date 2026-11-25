@@ -87,7 +87,7 @@ const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-b
   -->
   <section aria-labelledby="fooldal-cim" class="hero relative isolate overflow-hidden bg-night text-cream">
     <HolidayDecor />
-    <div class="hero-photo relative h-[13.5rem] sm:h-80 lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[44%]">
+    <div class="relative h-[13.5rem] sm:h-80 lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[44%]">
       <Photo
         src={heroPhoto}
         alt={t.home.heroAlt}
@@ -619,16 +619,8 @@ const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-b
     position: relative;
     z-index: 2;
   }
-  /*
-   * In the Christmas season, below desktop width, the photo strip starts under a slim dark eave
-   * where HolidayDecor's lights hang, so no bulb lands on a face in the photo; and the snowbank
-   * needs room under the price figures.
-   */
+  /* In the Christmas season, below desktop width, the snowbank needs room under the price figures. */
   @media (max-width: 63.99rem) {
-    :global(:root[data-season='christmas']) .hero-photo {
-      /* At least the bulbs' 24 px drop, also with a small default font. */
-      margin-top: max(1.5rem, 24px);
-    }
     :global(:root[data-season='christmas']) .hero-copy {
       padding-bottom: 2.5rem;
     }

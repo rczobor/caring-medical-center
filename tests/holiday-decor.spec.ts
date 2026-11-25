@@ -88,10 +88,14 @@ test.describe('in the Christmas season, on a phone', () => {
     const figures = await box(page.locator('.hero dl'));
     const bank = await box(decorations(page).snowbank);
     expect(figures.y + figures.height).toBeLessThanOrEqual(bank.y + 8);
-    // The lights hang in the dark eave above the photo, clear of the faces in it.
-    const photo = await box(page.locator('.hero-photo'));
+    // The lights hang over the photo's top edge: the photo starts where it does out of season.
+    const photo = () => box(page.locator('.hero img').first());
+    const lit = await photo();
     const lowestBulb = await decorations(page).bulbs.evaluateAll((els) => Math.max(...els.map((el) => el.getBoundingClientRect().bottom)));
-    expect(lowestBulb).toBeLessThanOrEqual(photo.y + 2);
+    expect(lowestBulb).toBeGreaterThan(lit.y);
+    await page.goto('/?season=off');
+    expect((await photo()).y).toBe(lit.y);
+    await page.goto('/?season=christmas');
     // The prices stay clickable through the snow.
     await page.locator('.hero dl a').first().click();
     await expect(page).toHaveURL(/rontgen-es-mr-arak|ct-arak/);
@@ -150,16 +154,6 @@ test('the bulbs flicker on their own keyframes, not the tree baubles\' gentler o
     page.locator(selector).first().evaluate((el) => el.getAnimations().flatMap(({ effect }) => (effect instanceof KeyframeEffect ? effect.getKeyframes() : []).map((k) => Number(k.opacity))));
   expect(Math.min(...(await dips('.hero .bulb')))).toBe(0.4);
   expect(Math.min(...(await dips('.hero .tree .ornament')))).toBe(0.55);
-});
-
-test('with a small default text size on a phone, the lights still hang clear of the photo', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send('Page.setFontSizes', { fontSizes: { standard: 12 } });
-  await page.goto('/?season=christmas');
-  const photo = await box(page.locator('.hero-photo'));
-  const lowestBulb = await decorations(page).bulbs.evaluateAll((els) => Math.max(...els.map((el) => el.getBoundingClientRect().bottom)));
-  expect(lowestBulb).toBeLessThanOrEqual(photo.y + 2);
 });
 
 /** How many pages the home page prints on, on A4. */
