@@ -1,0 +1,45 @@
+// Deploys the static build as Workers static assets, plus a small script for /api/*.
+// Without this file, `wrangler deploy` auto-configures the project by running
+// `astro add cloudflare`, which adds a server adapter we don't want and fails on pnpm's
+// build-script gate.
+{
+  "name": "caringmedical-site",
+  "compatibility_date": "2026-11-01",
+  // Runs only for the paths in assets.run_worker_first; every other request is a file.
+  "main": "./worker/index.ts",
+  // main deploys to the workers.dev URL. Every other branch gets a Preview on its own
+  // workers.dev hostname (Workers Builds runs `npx wrangler preview`). Preview URLs are
+  // public unless Access covers them: the Worker's Access policy covers both, so check
+  // a preview hostname still redirects to the Access login before changing that policy.
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": "./dist",
+    // Default html_handling ("auto-trailing-slash") serves /mrvizsgalat/emlo-mr
+    // from emlo-mr.html, matching build.format 'file' and trailingSlash 'never'.
+    "not_found_handling": "404-page",
+    // Without this, a request with no matching file would get the 404 page and never
+    // reach the script.
+    "run_worker_first": ["/api/*"]
+  },
+  // Contact form mail (worker/index.ts): from CONTACT_FROM to the one inbox in
+  // CONTACT_TO, the only address the form ever writes to. CONTACT_FROM's domain has to
+  // be onboarded in Email Service > Email Sending; until then sending fails and the form
+  // offers the phone number.
+  "send_email": [{ "name": "EMAIL" }],
+  // CONTACT_FROM and CONTACT_TO are set in the Cloudflare dashboard (Worker > Settings >
+  // Variables), so no address lives in the repository; keep_vars stops a deploy from
+  // removing them.
+  "keep_vars": true,
+  // Per visitor IPv4 address or IPv6 /64, per Cloudflare location: enough for a person
+  // retrying, not a script.
+  // namespace_id only has to be unique within the account.
+  "ratelimits": [{ "name": "CONTACT_LIMIT", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }],
+  // Workers Logs, so a failed send shows up with its error code. Invocation logs stay off:
+  // they would keep every visitor's IP and browser details for days.
+  "observability": { "enabled": true, "logs": { "invocation_logs": false } },
+  // Previews don't inherit bindings or vars from the top level; assets and
+  // compatibility settings do. That keeps branch previews from sending mail: their
+  // form answers 503. `wrangler preview` refuses to run without this block.
+  "previews": {}
+}

@@ -1,0 +1,139 @@
+---
+import { Image } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import BookingBar from '../components/BookingBar.astro';
+import PageHero from '../components/PageHero.astro';
+import TopicList from '../components/TopicList.astro';
+import ClosingCta from '../components/ClosingCta.astro';
+import Base from '../layouts/Base.astro';
+import { formatPhone } from '../lib/format';
+import { localeOf, localId } from '../lib/locale';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+const locale = localeOf(Astro.url);
+const link = await linker(locale);
+const page = (await getEntry('movewell', localId('movewell', locale)))?.data;
+if (!page) throw new Error(`src/content/movewell.yaml: no ${localId('movewell', locale)} entry`);
+const call = { href: `tel:${page.phone}`, label: ui[locale].call(formatPhone(page.phone), 'MoveWell') };
+// The same call button on the dark hero band.
+const onNight =
+  'inline-flex h-11 items-center justify-center rounded-full border-[1.5px] border-cream/60 px-5 font-bold whitespace-nowrap tabular-nums hover:border-cream';
+const outlined =
+  'inline-flex h-11 items-center justify-center rounded-full border border-ink/30 px-5 font-bold whitespace-nowrap tabular-nums hover:border-ink';
+---
+
+<!-- The programmes are the page's booking panel (#foglalas): each books its own package. -->
+<Base bookingPanel image={page.image} title={page.title} description={page.description}>
+  <PageHero eyebrow={page.eyebrow} title={page.heading} image={{ src: page.image, alt: page.imageAlt }}>
+    <p class="mt-4 max-w-[36rem] text-lg text-mist">{page.lead}</p>
+    <p class="mt-6">
+      <a href={call.href} aria-label={call.label} class={onNight}>{formatPhone(page.phone)}</a>
+    </p>
+  </PageHero>
+
+  <div class="mx-auto grid max-w-6xl gap-16 px-4 pt-12 pb-16 lg:pb-20">
+    <section aria-labelledby="elonyok" class="max-w-4xl">
+      <h2 id="elonyok" class="text-2xl font-semibold">{page.benefitsTitle}</h2>
+      <TopicList items={page.benefits} marker="check" />
+    </section>
+
+    <section aria-labelledby="hogyan">
+      <h2 id="hogyan" class="text-2xl font-semibold">{page.stepsTitle}</h2>
+      <!-- Three short stops of one day, stacked like every other set of steps: numerals in a gutter, joined by a gold line. -->
+      <ol class="mt-6 grid gap-y-5">
+        {
+          page.steps.map((step, i) => (
+            <li class="relative grid grid-cols-[2.75rem_minmax(0,1fr)] items-center gap-x-4">
+              {i < page.steps.length - 1 && (
+                <span aria-hidden="true" class="absolute top-12 -bottom-4 left-[1.375rem] w-0.5 -translate-x-1/2 rounded-full bg-gold" />
+              )}
+              <span
+                aria-hidden="true"
+                class="flex size-11 items-center justify-center rounded-full border-2 border-gold bg-paper text-lg font-bold text-gold-ink tabular-nums"
+              >
+                {i + 1}
+              </span>
+              <p class="text-lg leading-snug font-bold">{step}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section id="foglalas" aria-labelledby="programok" class="scroll-mt-4">
+      <h2 id="programok" class="text-2xl font-semibold text-balance">{page.programsTitle}</h2>
+      <ul class="mt-6 grid gap-6 md:grid-cols-2">
+        {
+          page.programs.map(({ name, text, cta }) => (
+            <li class="grid content-start gap-4 rounded-md border border-ink/20 p-6">
+              <h3 class="text-xl leading-snug font-bold">{name}</h3>
+              <p class="copy text-ink-muted">{text}</p>
+              <a
+                href={link(cta.page)}
+                data-booking-cta
+                class="inline-flex h-11 items-center justify-self-start rounded-full bg-gold px-6 font-bold text-ink hover:brightness-95"
+              >
+                {cta.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-md bg-cream px-5 py-4">
+        <p class="font-bold">{page.bookingPrompt}</p>
+        <a href={call.href} aria-label={call.label} class={outlined}>{formatPhone(page.phone)}</a>
+      </div>
+    </section>
+
+    <section aria-labelledby="idovonal">
+      <h2 id="idovonal" class="text-2xl font-semibold">{page.dayTitle}</h2>
+      <!--
+        The day as a timetable on one gold line. From tablet width the times sit in a
+        gutter; on phones each time is a label above its stop, so the text keeps the width.
+        The line joins the stops, so it ends at the last one.
+      -->
+      <ol class="mt-6 grid max-w-3xl">
+        {
+          page.day.map(({ time, title, text }) => (
+            <li class="relative border-l-2 border-gold pb-7 pl-6 last:border-l-transparent last:pb-0 sm:grid sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-x-5 sm:border-l-0 sm:pb-0 sm:pl-0">
+              <span aria-hidden="true" class="absolute top-1.5 -left-[7px] size-3 rounded-full bg-gold ring-4 ring-paper sm:hidden" />
+              <p class="text-sm font-bold whitespace-nowrap text-gold-ink tabular-nums sm:text-base">{time}</p>
+              <div class="mt-0.5 sm:relative sm:mt-0 sm:border-l-2 sm:border-gold sm:pb-7 sm:pl-6 [li:last-child_&]:pb-0 [li:last-child_&]:border-l-transparent">
+                <span aria-hidden="true" class="absolute top-1.5 -left-[7px] hidden size-3 rounded-full bg-gold ring-4 ring-paper sm:block" />
+                <h3 class="font-bold">{title}</h3>
+                <p class="copy mt-1 text-ink-muted">{text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="csapat">
+      <h2 id="csapat" class="text-2xl font-semibold">{page.teamTitle}</h2>
+      <ul class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          page.team.map(({ name, role, photo }) => (
+            <li class="grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-x-5">
+              {/* The name says who it is, so the portrait is decorative. */}
+              <Image src={photo} alt="" widths={[96, 192]} sizes="96px" class="aspect-square w-full rounded-md bg-line object-cover object-top" />
+              <div>
+                <h3 class="text-lg font-bold">{name}</h3>
+                <p class="text-ink-muted">{role}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="gyik" class="max-w-4xl">
+      <h2 id="gyik" class="text-2xl font-semibold">{page.faq.title}</h2>
+      <TopicList items={page.faq.items.map(({ question, answer }) => ({ title: question, text: answer }))} />
+    </section>
+  </div>
+
+  <ClosingCta href="#foglalas" />
+  <BookingBar />
+</Base>

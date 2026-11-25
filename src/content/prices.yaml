@@ -1,0 +1,1018 @@
+- id: rtg-vizsgalat-1-iranyu
+  category: rtg
+  name: RTG vizsgálat 1 irányú
+  huf: 18500
+  en:
+    name: X-ray, 1 view
+- id: rtg-vizsgalat-2-iranyu
+  category: rtg
+  name: RTG vizsgálat 2 irányú
+  huf: 20000
+  en:
+    name: X-ray, 2 views
+- id: rtg-teljes-gerinc-2-iranyu
+  category: rtg
+  name: RTG teljes gerinc 2 irányú
+  huf: 40000
+  en:
+    name: X-ray, whole spine, 2 views
+- id: rtg-tovabbi-felvetel
+  category: rtg
+  name: RTG további felvétel
+  huf: 10000
+  extra: true
+  en:
+    name: X-ray, additional image
+- id: agykoponya-nativ-angiografias-mr-vizsgalata
+  category: mr
+  name: Agykoponya natív angiográfiás MR vizsgálata
+  minutes: 25
+  huf: 70900
+  en:
+    name: Brain MR angiography without contrast
+- id: agykoponya-nativ-es-kontrasztos-angiografias-mr-vizsgalata
+  category: mr
+  name: Agykoponya natív és kontrasztos angiográfiás MR vizsgálata
+  minutes: 40
+  huf: 91000
+  en:
+    name: Brain MR angiography with and without contrast
+- id: agykoponya-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Agykoponya natív és kontrasztos MR vizsgálata
+  minutes: 40
+  huf: 91000
+  en:
+    name: Brain MRI with and without contrast
+- id: agykoponya-nativ-mr-vizsgalata
+  category: mr
+  name: Agykoponya natív MR vizsgálata
+  minutes: 25
+  huf: 57900
+  en:
+    name: Brain MRI without contrast
+- id: alkar-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Alkar natív és kontrasztos MR vizsgálata
+  minutes: 50
+  huf: 91000
+  en:
+    name: Forearm MRI with and without contrast
+- id: alkar-nativ-mr-vizsgalata
+  category: mr
+  name: Alkar natív MR vizsgálata
+  minutes: 30
+  huf: 57900
+  en:
+    name: Forearm MRI without contrast
+- id: allkapocs-izulet-nativ-mr-vizsgalata
+  category: mr
+  name: Állkapocs ízület natív MR vizsgálata
+  minutes: 35
+  huf: 70900
+  en:
+    name: Temporomandibular joint (TMJ) MRI without contrast
+- id: arckoponya-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Arckoponya natív és kontrasztos MR vizsgálata
+  minutes: 45
+  huf: 91000
+  en:
+    name: Facial bones MRI with and without contrast
+- id: arckoponya-nativ-mr-vizsgalata
+  category: mr
+  name: Arckoponya natív MR vizsgálata
+  minutes: 30
+  huf: 57900
+  en:
+    name: Facial bones MRI without contrast
+- id: belso-ful-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Belső fül natív és kontrasztos MR vizsgálata
+  minutes: 45
+  huf: 91000
+  en:
+    name: Inner ear MRI with and without contrast
+- id: belso-ful-nativ-mr-vizsgalata
+  category: mr
+  name: Belső fül natív MR vizsgálata
+  minutes: 30
+  huf: 57900
+  en:
+    name: Inner ear MRI without contrast
+- id: boka-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Boka natív és kontrasztos MR vizsgálata
+  minutes: 50
+  huf: 91000
+  en:
+    name: Ankle MRI with and without contrast
+- id: boka-nativ-mr-vizsgalata
+  category: mr
+  name: Boka natív MR vizsgálata
+  minutes: 20
+  huf: 57900
+  en:
+    name: Ankle MRI without contrast
+- id: boka-nativ-mr-vizsgalata-mindket-boka
+  category: mr
+  name: Boka natív MR vizsgálata (mindkét boka)
+  minutes: 40
+  huf: 115800
+  en:
+    name: Ankle MRI without contrast (both ankles)
+- id: comb-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Comb natív és kontrasztos MR vizsgálata
+  minutes: 35
+  huf: 91000
+  en:
+    name: Thigh MRI with and without contrast
+- id: comb-nativ-mr-vizsgalata
+  category: mr
+  name: Comb natív MR vizsgálata
+  minutes: 25
+  huf: 59900
+  en:
+    name: Thigh MRI without contrast
+- id: csipo-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Csípő natív és kontrasztos MR vizsgálata
+  minutes: 40
+  huf: 91000
+  en:
+    name: Hip MRI with and without contrast
+- id: csipo-nativ-mr-vizsgalata-egy-oldal
+  category: mr
+  name: Csípő natív MR vizsgálata (egy oldal)
+  minutes: 25
+  huf: 57900
+  en:
+    name: Hip MRI without contrast (one side)
+- id: csipo-nativ-mr-vizsgalata-mindket-oldal
+  category: mr
+  name: Csípő natív MR vizsgálata (mindkét oldal)
+  minutes: 30
+  huf: 70900
+  en:
+    name: Hip MRI without contrast (both sides)
+- id: csontos-medence-mr
+  category: mr
+  name: Csontos medence MR
+  minutes: 30
+  huf: 57900
+  en:
+    name: Bony pelvis MRI
+- id: csuklo-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Csukló natív és kontrasztos MR vizsgálata
+  minutes: 50
+  huf: 91000
+  en:
+    name: Wrist MRI with and without contrast
+- id: csuklo-nativ-mr-vizsgalata
+  category: mr
+  name: Csukló natív MR vizsgálata
+  minutes: 20
+  huf: 57900
+  en:
+    name: Wrist MRI without contrast
+- id: emlo-nativ-es-kontrasztos-implant-mirigy-mr-vizsgalata
+  category: mr
+  name: Emlő natív és kontrasztos implant + mirigy MR vizsgálata
+  minutes: 75
+  huf: 112000
+  en:
+    name: Breast MRI with and without contrast, implant + glandular tissue
+- id: emlo-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Emlő natív és kontrasztos MR vizsgálata
+  minutes: 50
+  huf: 101000
+  en:
+    name: Breast MRI with and without contrast
+- id: emlo-nativ-mr-vizsgalata
+  category: mr
+  name: Emlő natív MR vizsgálata
+  minutes: 35
+  huf: 70900
+  en:
+    name: Breast MRI without contrast
+- id: felkar-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Felkar natív és kontrasztos MR vizsgálata
+  minutes: 45
+  huf: 91000
+  en:
+    name: Upper arm MRI with and without contrast
+- id: felkar-nativ-mr-vizsgalata
+  category: mr
+  name: Felkar natív MR vizsgálata
+  minutes: 25
+  huf: 57900
+  en:
+    name: Upper arm MRI without contrast
+- id: gerinc-agyeki-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Gerinc - ágyéki natív és kontrasztos MR vizsgálata
+  minutes: 35
+  huf: 91000
+  en:
+    name: Lumbar spine MRI with and without contrast
+- id: gerinc-agyeki-nativ-mr-vizsgalata
+  category: mr
+  name: Gerinc - ágyéki natív MR vizsgálata
+  minutes: 20
+  huf: 57900
+  en:
+    name: Lumbar spine MRI without contrast
+- id: gerinc-hati-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Gerinc - háti natív és kontrasztos MR vizsgálata
+  minutes: 35
+  huf: 91000
+  en:
+    name: Thoracic spine MRI with and without contrast
+- id: gerinc-hati-nativ-mr-vizsgalata
+  category: mr
+  name: Gerinc - háti natív MR vizsgálata
+  minutes: 20
+  huf: 57900
+  en:
+    name: Thoracic spine MRI without contrast
+- id: gerinc-nyaki-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Gerinc - nyaki natív és kontrasztos MR vizsgálata
+  minutes: 35
+  huf: 91000
+  en:
+    name: Cervical spine MRI with and without contrast
+- id: gerinc-nyaki-nativ-mr-vizsgalata
+  category: mr
+  name: Gerinc - nyaki natív MR vizsgálata
+  minutes: 20
+  huf: 57900
+  en:
+    name: Cervical spine MRI without contrast
+- id: glutealis-fenek-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Gluteális (fenék) natív és kontrasztos MR vizsgálata
+  minutes: 60
+  huf: 91000
+  en:
+    name: Gluteal (buttock) MRI with and without contrast
+- id: glutealis-fenek-nativ-mr-vizsgalata
+  category: mr
+  name: Gluteális (fenék) natív MR vizsgálata
+  minutes: 40
+  huf: 57900
+  en:
+    name: Gluteal (buttock) MRI without contrast
+- id: has-es-kismedence-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Has és kismedence natív és kontrasztos MR vizsgálata
+  minutes: 60
+  huf: 139900
+  en:
+    name: Abdomen and pelvis MRI with and without contrast
+- id: has-es-kismedence-nativ-mr-vizsgalata
+  category: mr
+  name: Has és kismedence natív MR vizsgálata
+  minutes: 50
+  huf: 101000
+  en:
+    name: Abdomen and pelvis MRI without contrast
+- id: has-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Has natív és kontrasztos MR vizsgálata
+  minutes: 60
+  huf: 91000
+  en:
+    name: Abdomen MRI with and without contrast
+- id: has-nativ-mr-vizsgalata
+  category: mr
+  name: Has natív MR vizsgálata
+  minutes: 40
+  huf: 57900
+  en:
+    name: Abdomen MRI without contrast
+- id: keresztcsont-sacrum-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Keresztcsont (Sacrum) natív és kontrasztos MR vizsgálata
+  minutes: 45
+  huf: 91000
+  en:
+    name: Sacrum MRI with and without contrast
+- id: keresztcsont-sacrum-nativ-mr-vizsgalata
+  category: mr
+  name: Keresztcsont (Sacrum) natív MR vizsgálata
+  minutes: 25
+  huf: 57900
+  en:
+    name: Sacrum MRI without contrast
+- id: kez-ujjak-izuletei-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Kéz - ujjak ízületei natív és kontrasztos MR vizsgálata
+  minutes: 50
+  huf: 91000
+  en:
+    name: Hand and finger joints MRI with and without contrast
+- id: kez-ujjak-izuletei-nativ-mr-vizsgalata
+  category: mr
+  name: Kéz - ujjak ízületei natív MR vizsgálata
+  minutes: 20
+  huf: 57900
+  en:
+    name: Hand and finger joints MRI without contrast
+- id: kismedence-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Kismedence natív és kontrasztos MR vizsgálata
+  minutes: 45
+  huf: 91000
+  en:
+    name: Pelvis MRI with and without contrast
+- id: kismedence-nativ-mr-vizsgalata
+  category: mr
+  name: Kismedence natív MR vizsgálata
+  minutes: 30
+  huf: 57900
+  en:
+    name: Pelvis MRI without contrast
+- id: kolangiografia-mrcp-es-has-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Kolangiográfia (MRCP) és has natív és kontrasztos MR vizsgálata
+  minutes: 60
+  huf: 101000
+  en:
+    name: MR cholangiography (MRCP) and abdomen MRI with and without contrast
+- id: kolangiografia-mrcp-es-has-nativ-mr-vizsgalata
+  category: mr
+  name: Kolangiográfia (MRCP) és has natív MR vizsgálata
+  minutes: 40
+  huf: 70900
+  en:
+    name: MR cholangiography (MRCP) and abdomen MRI without contrast
+- id: kolangiografia-mrcp-nativ-mr-vizsgalata
+  category: mr
+  name: Kolangiográfia (MRCP) natív MR vizsgálata
+  minutes: 40
+  huf: 70900
+  en:
+    name: MR cholangiography (MRCP) without contrast
+- id: konyok-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Könyök natív és kontrasztos MR vizsgálata
+  minutes: 50
+  huf: 91000
+  en:
+    name: Elbow MRI with and without contrast
+- id: konyok-nativ-mr-vizsgalata
+  category: mr
+  name: Könyök natív MR vizsgálata
+  minutes: 20
+  huf: 57900
+  en:
+    name: Elbow MRI without contrast
+- id: kulcscsont-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Kulcscsont natív és kontrasztos MR vizsgálata
+  minutes: 60
+  huf: 91000
+  en:
+    name: Collarbone MRI with and without contrast
+- id: kulcscsont-nativ-mr-vizsgalata
+  category: mr
+  name: Kulcscsont natív MR vizsgálata
+  minutes: 40
+  huf: 57900
+  en:
+    name: Collarbone MRI without contrast
+- id: labfej-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Lábfej natív és kontrasztos MR vizsgálata
+  minutes: 50
+  huf: 91000
+  en:
+    name: Foot MRI with and without contrast
+- id: labfej-nativ-mr-vizsgalata
+  category: mr
+  name: Lábfej natív MR vizsgálata
+  minutes: 20
+  huf: 57900
+  en:
+    name: Foot MRI without contrast
+- id: labszar-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Lábszár natív és kontrasztos MR vizsgálata
+  minutes: 45
+  huf: 91000
+  en:
+    name: Lower leg MRI with and without contrast
+- id: labszar-nativ-mr-vizsgalata
+  category: mr
+  name: Lábszár natív MR vizsgálata
+  minutes: 30
+  huf: 57900
+  en:
+    name: Lower leg MRI without contrast
+- id: lapocka-nativ-mr-vizsgalata
+  category: mr
+  name: Lapocka natív MR vizsgálata
+  minutes: 40
+  huf: 57900
+  en:
+    name: Shoulder blade MRI without contrast
+- id: mellkas-sternum-nativ-mr-vizsgalata
+  category: mr
+  name: Mellkas (STERNUM!) natív MR vizsgálata
+  minutes: 40
+  huf: 57900
+  en:
+    name: Chest (sternum) MRI without contrast
+- id: mellkas-sternum-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Mellkas (STERNUM)natív és kontrasztos MR vizsgálata
+  minutes: 50
+  huf: 91000
+  en:
+    name: Chest (sternum) MRI with and without contrast
+- id: mr-arthrografia
+  category: mr
+  name: MR arthrográfia
+  minutes: 60
+  huf: 91000
+  en:
+    name: MR arthrography
+- id: mri-vizsgalat
+  category: mr
+  name: MRI vizsgálat
+  minutes: 25
+  huf: 57900
+  en:
+    name: MRI scan
+- id: nyaki-lagyresz-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Nyaki lágyrész natív és kontrasztos MR vizsgálata
+  minutes: 45
+  huf: 91000
+  en:
+    name: Neck soft tissue MRI with and without contrast
+- id: nyaki-lagyresz-nativ-mr-vizsgalata
+  category: mr
+  name: Nyaki lágyrész natív MR vizsgálata
+  minutes: 45
+  huf: 57900
+  en:
+    name: Neck soft tissue MRI without contrast
+- id: orbita-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Orbita natív és kontrasztos MR vizsgálata
+  minutes: 60
+  huf: 91000
+  en:
+    name: Orbit (eye socket) MRI with and without contrast
+- id: orbita-nativ-mr-vizsgalata
+  category: mr
+  name: Orbita natív MR vizsgálata
+  minutes: 60
+  huf: 57900
+  en:
+    name: Orbit (eye socket) MRI without contrast
+- id: piriformis-izom-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Piriformis izom natív és kontrasztos MR vizsgálata
+  minutes: 60
+  huf: 91000
+  en:
+    name: Piriformis muscle MRI with and without contrast
+- id: piriformis-izom-nativ-mr-vizsgalata
+  category: mr
+  name: Piriformis izom natív MR vizsgálata
+  minutes: 60
+  huf: 57900
+  en:
+    name: Piriformis muscle MRI without contrast
+- id: prosztata-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Prosztata natív és kontrasztos MR vizsgálata
+  minutes: 50
+  huf: 112000
+  en:
+    name: Prostate MRI with and without contrast
+- id: prosztata-nativ-mr-vizsgalata
+  category: mr
+  name: Prosztata natív MR vizsgálata
+  minutes: 40
+  huf: 57900
+  en:
+    name: Prostate MRI without contrast
+- id: sella-agyalapi-mirigy-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Sella (agyalapi mirigy) natív és kontrasztos MR vizsgálata
+  minutes: 30
+  huf: 91000
+  en:
+    name: Pituitary gland (sella) MRI with and without contrast
+- id: sella-agyalapi-mirigy-nativ-mr-vizsgalata
+  category: mr
+  name: Sella (agyalapi mirigy) natív MR vizsgálata
+  minutes: 25
+  huf: 57900
+  en:
+    name: Pituitary gland (sella) MRI without contrast
+- id: sziv-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Szív natív és kontrasztos MR vizsgálata
+  minutes: 90
+  huf: 169900
+  en:
+    name: Cardiac MRI with and without contrast
+- id: sziv-nativ-mr-vizsgalata
+  category: mr
+  name: Szív natív MR vizsgálata
+  minutes: 60
+  huf: 109000
+  en:
+    name: Cardiac MRI without contrast
+- id: terd-mr-vizsgalat-protezis-tervezeshez-psi
+  category: mr
+  name: Térd MR vizsgálat protézis tervezéshez-PSI
+  minutes: 20
+  huf: 79900
+  en:
+    name: Knee MRI for implant planning (PSI)
+- id: terd-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Térd natív és kontrasztos MR vizsgálata
+  minutes: 50
+  huf: 91000
+  en:
+    name: Knee MRI with and without contrast
+- id: terd-nativ-mr-vizsgalata
+  category: mr
+  name: Térd natív MR vizsgálata
+  minutes: 20
+  huf: 57900
+  en:
+    name: Knee MRI without contrast
+- id: terd-nativ-mr-vizsgalata-mindket-terd
+  category: mr
+  name: Térd natív MR vizsgálata (mindkét térd)
+  minutes: 40
+  huf: 115800
+  en:
+    name: Knee MRI without contrast (both knees)
+- id: vall-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Váll natív és kontrasztos MR vizsgálata
+  minutes: 30
+  huf: 91000
+  en:
+    name: Shoulder MRI with and without contrast
+- id: vall-nativ-mr-vizsgalata
+  category: mr
+  name: Váll natív MR vizsgálata
+  minutes: 25
+  huf: 57900
+  en:
+    name: Shoulder MRI without contrast
+- id: vall-nativ-mr-vizsgalata-mindket-vall
+  category: mr
+  name: Váll natív MR vizsgálata (mindkét váll)
+  minutes: 50
+  huf: 115800
+  en:
+    name: Shoulder MRI without contrast (both shoulders)
+- id: vekonybel-enterografia-nativ-es-kontrasztos-mr-vizsgalata
+  category: mr
+  name: Vékonybél (enterográfia) natív és kontrasztos MR vizsgálata
+  minutes: 90
+  huf: 101000
+  en:
+    name: Small bowel MRI (enterography) with and without contrast
+- id: helyszinen-vegzett-vesefunkcios-vizsgalat
+  category: mr
+  name: Helyszínen végzett vesefunkciós vizsgálat
+  huf: 4000
+  extra: true
+  en:
+    name: On-site kidney function test
+- id: surgossegi-mri-vizsgalat-rendelesi-idoben-idopont-nelkuli-sos-vizsgalat
+  category: mr
+  name: Sűrgősségi MRI vizsgálat (rendelési időben, időpont nélküli SOS-vizsgálat)
+  huf: 70900
+  extra: true
+  en:
+    name: Urgent MRI scan (during opening hours, SOS walk-in exam without an appointment)
+- id: surgossegi-mri-vizsgalat-nyitvatartasi-idon-kivul-es-unnepnapokon
+  category: mr
+  name: Sűrgősségi MRI vizsgálat (nyitvatartási időn kívül és ünnepnapokon)
+  huf: 70900
+  extra: true
+  en:
+    name: Urgent MRI scan (outside opening hours and on public holidays)
+- id: angol-nyelvu-leletezes-kulon-kerheto
+  category: mr
+  name: Angol nyelvű leletezés (külön kérhető)
+  huf: 20000
+  extra: true
+  en:
+    name: Report in English (on request)
+- id: diagnosztikai-vizsgalatok-eseteben-a-vizsgalat-kepi-anyaganak-cd-lemezre-torteno-kiirasa
+  category: mr
+  name: Diagnosztikai vizsgálatok esetében a vizsgálat képi anyagának CD-lemezre történő kiírása
+  huf: 2500
+  extra: true
+  en:
+    name: Copy of the exam images on CD (diagnostic exams)
+- id: altatasos-mr-altatasi-kiegeszito-dija
+  category: mr
+  name: Altatásos MR altatási kiegészítő díja
+  huf: 50000
+  unit: /óra
+  extra: true
+  en:
+    name: MRI under general anesthesia, anesthesia surcharge
+    unit: /hour
+- id: ct-agykoponya-nativ-ct-vizsgalata
+  category: ct
+  name: Agykoponya natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Brain CT without contrast
+- id: ct-agykoponya-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Agykoponya natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Brain CT with and without contrast
+- id: ct-alkar-nativ-ct-vizsgalata
+  category: ct
+  name: Alkar natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Forearm CT without contrast
+- id: ct-alkar-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Alkar natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Forearm CT with and without contrast
+- id: ct-also-vegtagi-ct-angiografia
+  category: ct
+  name: Alsó végtagi CT angiográfia
+  huf: 74000
+  en:
+    name: Lower limb CT angiography
+- id: ct-arckoponya-nativ-ct-vizsgalata
+  category: ct
+  name: Arckoponya natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Facial bones CT without contrast
+- id: ct-arckoponya-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Arckoponya natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Facial bones CT with and without contrast
+- id: ct-boka-nativ-ct-vizsgalata
+  category: ct
+  name: Boka natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Ankle CT without contrast
+- id: ct-boka-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Boka natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Ankle CT with and without contrast
+- id: ct-comb-nativ-ct-vizsgalata
+  category: ct
+  name: Comb natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Thigh CT without contrast
+- id: ct-comb-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Comb natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Thigh CT with and without contrast
+- id: ct-csipo-nativ-ct-vizsgalata-mindket-oldal
+  category: ct
+  name: Csípő natív CT vizsgálata (mindkét oldal)
+  huf: 39900
+  en:
+    name: Hip CT without contrast (both sides)
+- id: ct-csipo-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Csípő natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Hip CT with and without contrast
+- id: ct-csuklo-nativ-ct-vizsgalata
+  category: ct
+  name: Csukló natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Wrist CT without contrast
+- id: ct-csuklo-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Csukló natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Wrist CT with and without contrast
+- id: ct-felkar-nativ-ct-vizsgalata
+  category: ct
+  name: Felkar natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Upper arm CT without contrast
+- id: ct-felkar-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Felkar natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Upper arm CT with and without contrast
+- id: ct-gerinc-agyeki-nativ-ct-vizsgalata
+  category: ct
+  name: Gerinc - ágyéki natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Lumbar spine CT without contrast
+- id: ct-gerinc-agyeki-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Gerinc - ágyéki natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Lumbar spine CT with and without contrast
+- id: ct-gerinc-hati-nativ-ct-vizsgalata
+  category: ct
+  name: Gerinc - háti natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Thoracic spine CT without contrast
+- id: ct-gerinc-hati-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Gerinc - háti natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Thoracic spine CT with and without contrast
+- id: ct-gerinc-nyaki-nativ-ct-vizsgalata
+  category: ct
+  name: Gerinc - nyaki natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Cervical spine CT without contrast
+- id: ct-gerinc-nyaki-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Gerinc - nyaki natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Cervical spine CT with and without contrast
+- id: ct-has-es-kismedence-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Has és kismedence natív és kontrasztos CT vizsgálata
+  huf: 74000
+  en:
+    name: Abdomen and pelvis CT with and without contrast
+- id: ct-has-kismedence-nativ-ct-vizsgalata
+  category: ct
+  name: Has-Kismedence natív CT vizsgálata
+  huf: 45900
+  en:
+    name: Abdomen and pelvis CT without contrast
+- id: ct-kez-ujjak-izuletei-nativ-ct-vizsgalata
+  category: ct
+  name: Kéz - ujjak ízületei natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Hand and finger joints CT without contrast
+- id: ct-kez-ujjak-izuletei-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Kéz - ujjak ízületei natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Hand and finger joints CT with and without contrast
+- id: ct-konyok-nativ-ct-vizsgalata
+  category: ct
+  name: Könyök natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Elbow CT without contrast
+- id: ct-konyok-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Könyök natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Elbow CT with and without contrast
+- id: ct-labfej-nativ-ct-vizsgalata
+  category: ct
+  name: Lábfej natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Foot CT without contrast
+- id: ct-labfej-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Lábfej natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Foot CT with and without contrast
+- id: ct-labszar-nativ-ct-vizsgalata
+  category: ct
+  name: Lábszár natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Lower leg CT without contrast
+- id: ct-labszar-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Lábszár natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Lower leg CT with and without contrast
+- id: ct-mellkas-angiografias-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Mellkas angiográfiás kontrasztos CT vizsgálata
+  huf: 74000
+  en:
+    name: Chest CT angiography with contrast
+- id: ct-mellkas-nativ-kontrasztanyag-nelkuli-ct-vizsgalata
+  category: ct
+  name: Mellkas natív (kontrasztanyag nélküli) CT vizsgálata
+  huf: 39900
+  en:
+    name: Chest CT without contrast
+- id: ct-mellkas-has-kismedence-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Mellkas-Has-Kismedence kontrasztos CT vizsgálata
+  huf: 99900
+  en:
+    name: Chest, abdomen and pelvis CT with contrast
+- id: ct-mellkas-has-kismedence-nativ-ct-vizsgalata
+  category: ct
+  name: Mellkas-has-kismedence natív CT vizsgálata
+  huf: 74900
+  en:
+    name: Chest, abdomen and pelvis CT without contrast
+- id: ct-mellkas-kontrasztanyagos
+  category: ct
+  name: Mellkas-kontrasztanyagos
+  huf: 59900
+  en:
+    name: Chest CT with contrast
+- id: ct-nyak-angiografias-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Nyak angiográfiás kontrasztos CT vizsgálata
+  huf: 74000
+  en:
+    name: Neck CT angiography with contrast
+- id: ct-nyaki-lagyresz-ct-vizsgalat
+  category: ct
+  name: Nyaki lágyrész CT vizsgálat
+  huf: 39900
+  en:
+    name: Neck soft tissue CT
+- id: ct-nyaki-lagyresz-kontrasztos-ct-vizsgalat
+  category: ct
+  name: Nyaki lágyrész kontrasztos CT vizsgálat
+  huf: 59900
+  en:
+    name: Neck soft tissue CT with contrast
+- id: ct-protezis-tervezes-ct
+  category: ct
+  name: Protézis tervezés CT
+  huf: 58000
+  en:
+    name: CT for implant planning
+- id: ct-terd-nativ-ct-vizsgalata
+  category: ct
+  name: Térd natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Knee CT without contrast
+- id: ct-terd-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Térd natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Knee CT with and without contrast
+- id: ct-vall-nativ-ct-vizsgalata
+  category: ct
+  name: Váll natív CT vizsgálata
+  huf: 39900
+  en:
+    name: Shoulder CT without contrast
+- id: ct-vall-nativ-es-kontrasztos-ct-vizsgalata
+  category: ct
+  name: Váll natív és kontrasztos CT vizsgálata
+  huf: 59900
+  en:
+    name: Shoulder CT with and without contrast
+- id: rehab-gyogytorna-60-perc
+  category: rehab
+  name: Gyógytorna 60 perc
+  huf: 16000
+  en:
+    name: Physiotherapy, 60 minutes
+- id: rehab-egyeni-gyogytorna
+  category: rehab
+  name: Egyéni gyógytorna
+  huf: 14000
+  en:
+    name: Individual physiotherapy
+- id: rehab-csoportos-gyogytorna
+  category: rehab
+  name: Csoportos gyógytorna
+  huf: 16000
+  en:
+    name: Group physiotherapy
+- id: rehab-sis-magnesterapia-alkalom
+  category: rehab
+  name: SIS mágnesterápia / alkalom
+  huf: 17000
+  en:
+    name: SIS magnetic therapy, per session
+- id: rehab-lokeshullam-terapia-alkalom
+  category: rehab
+  name: Lökéshullám terápia / alkalom
+  huf: 15000
+  en:
+    name: Shockwave therapy, per session
+- id: rehab-lezerkezeles
+  category: rehab
+  name: Lézerkezelés
+  huf: 8000
+  en:
+    name: Laser therapy
+- id: rehab-kinesiotape-hasznalata-1-meterig
+  category: rehab
+  name: Kinesiotape használata (1 méterig)
+  huf: 4000
+  en:
+    name: Kinesiology taping (up to 1 meter)
+- id: rehab-fitoterapia-termeszetgyogyaszat-elso-alkalom
+  category: rehab
+  name: Fitoterápia-természetgyógyászat első alkalom
+  huf: 30000
+  en:
+    name: Phytotherapy and naturopathy, first visit
+- id: rehab-fitoterapia-termeszetgyogyaszat-kontroll
+  category: rehab
+  name: Fitoterápia, természetgyógyászat kontroll
+  huf: 25000
+  en:
+    name: Phytotherapy and naturopathy, follow-up
+- id: rehab-ortopedia-elso-vizsgalat
+  category: rehab
+  name: Ortopédia első vizsgálat
+  huf: 40000
+  en:
+    name: Orthopedics, first exam
+- id: rehab-ortopedia-kontroll
+  category: rehab
+  name: Ortopédia kontroll
+  huf: 28000
+  en:
+    name: Orthopedics, follow-up
+- id: rehab-neurologia-elso-konzultacio
+  category: rehab
+  name: Neurológia első konzultáció
+  huf: 40000
+  en:
+    name: Neurology, first consultation
+- id: rehab-neurologia-kontroll-konzultacio-3-honapon-belul
+  category: rehab
+  name: Neurológia kontroll konzultáció (3 hónapon belül)
+  huf: 30000
+  unit: /20 perc
+  en:
+    name: Neurology, follow-up consultation (within 3 months)
+    unit: /20 min
+- id: rehab-neurologia-masodvelemeny-irasban
+  category: rehab
+  name: Neurológia másodvélemény írásban
+  huf: 20000
+  en:
+    name: Neurology, written second opinion
+- id: rehab-neurologia-express-kontroll-e-recept
+  category: rehab
+  name: Neurológia express kontroll/e-recept
+  huf: 12000
+  unit: /10 perc
+  en:
+    name: Neurology, express follow-up / e-prescription
+    unit: /10 min
+- id: rehab-kezdo-fejfajas-csomag
+  category: rehab
+  name: Kezdő fejfájás csomag
+  huf: 60000
+  en:
+    name: Headache starter package
+- id: rehab-migren-menedzsment-csomag-3-honap
+  category: rehab
+  name: Migrén menedzsment csomag (3 hónap)
+  huf: 90000
+  en:
+    name: Migraine management package (3 months)

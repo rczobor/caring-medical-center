@@ -1,0 +1,46 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatPhone } from '../lib/format';
+import { uiFor } from '../lib/ui';
+
+interface Props {
+  bookings: { clinic: CollectionEntry<'clinics'>; system: string; url: string }[];
+  /** Heading level for clinic names, to fit the surrounding outline. */
+  level?: 'h3' | 'h4';
+}
+const { bookings, level: Heading = 'h3' } = Astro.props;
+const t = uiFor(Astro.url);
+---
+
+<ul class="divide-y divide-line">
+  {
+    bookings.map(({ clinic: { data: clinic }, url }) => (
+      <li class="grid gap-3 px-5 py-4">
+        <div>
+          <Heading class="font-bold">{clinic.name}</Heading>
+          <p class="text-sm text-ink-muted">
+            {clinic.address.postalCode} {clinic.address.city}, {clinic.address.street}
+          </p>
+        </div>
+        <!-- Online booking and calling are equal choices: same size, 44 px targets, aligned across clinics. -->
+        <div class="grid grid-cols-2 gap-2">
+          <!-- Labels start with the visible text, so voice users can say what they see. -->
+          <a
+            href={url}
+            aria-label={t.bookOnlineAt(clinic.name)}
+            class="inline-flex h-11 items-center justify-center rounded-full bg-gold px-3 text-sm font-bold text-ink hover:brightness-95"
+          >
+            {t.bookOnline}
+          </a>
+          <a
+            href={`tel:${clinic.phone}`}
+            aria-label={t.call(formatPhone(clinic.phone), clinic.name)}
+            class="inline-flex h-11 items-center justify-center rounded-full border border-ink/30 px-3 text-sm font-bold whitespace-nowrap tabular-nums hover:border-ink"
+          >
+            {formatPhone(clinic.phone)}
+          </a>
+        </div>
+      </li>
+    ))
+  }
+</ul>

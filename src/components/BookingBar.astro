@@ -1,0 +1,37 @@
+---
+// The phone booking bar for pages with their own booking panel (#foglalas).
+// Pages that use it pass `bookingPanel` to Base, which keeps the footer clear of it.
+import { uiFor } from '../lib/ui';
+
+const t = uiFor(Astro.url);
+---
+
+<div
+  data-booking-bar
+  data-pagefind-ignore
+  class="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-paper/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur transition-transform duration-200 motion-reduce:transition-none data-[hidden]:translate-y-full lg:hidden"
+>
+  <a href="#foglalas" class="block rounded-full bg-gold py-3 text-center font-bold text-ink">{t.book}</a>
+</div>
+
+<script>
+  // The bar repeats the booking action, so it steps aside while the booking panel, or
+  // another "Időpontfoglalás" button ([data-booking-cta]), is on screen.
+  const bar = document.querySelector<HTMLElement>('[data-booking-bar]');
+  const targets = [document.getElementById('foglalas'), ...document.querySelectorAll('[data-booking-cta]')].filter(
+    (el): el is HTMLElement => el instanceof HTMLElement,
+  );
+  if (bar && targets.length) {
+    const visible = new Set<Element>();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visible.add(entry.target);
+        else visible.delete(entry.target);
+      }
+      const hide = visible.size > 0;
+      bar.toggleAttribute('data-hidden', hide);
+      bar.inert = hide;
+    });
+    targets.forEach((el) => observer.observe(el));
+  }
+</script>

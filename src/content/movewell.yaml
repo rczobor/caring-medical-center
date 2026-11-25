@@ -1,0 +1,161 @@
+# The MoveWell page (/movewell).
+- id: movewell
+  title: MoveWell Rehabilitáció – Caring Medical Center | Mozgásszervi Terápia
+  description: 'Caring Medical Center MoveWell program: személyre szabott mozgásszervi rehabilitáció, fizikoterápia és regeneráció a gyorsabb felépülésért diagnosztikai háttértámogatással.'
+  eyebrow: MoveWell
+  heading: MoveWell – Egy nap alatt diagnózis és megoldás
+  lead: 'Sport- és krónikus mozgásszervi panaszokra: diagnosztika → szakorvosi vélemény → terápia → rehabilitáció, egy helyen.'
+  image: '@assets/site/gXdr0jvChbYoDPt0fztNXXwps8.jpg'
+  imageAlt: Páciens gyakorlatot végez a bordásfalnál a Medical Pointban
+  phone: '+3618009772'
+  benefitsTitle: Ezért éri meg a MoveWell-t választani
+  benefits:
+    - title: Gyors hozzáférés
+      text: 24–72 órán belüli vizsgálat
+    - title: Komplex ellátás egy napon
+      text: diagnózis + terápia
+    - title: Személyre szabott rehabilitáció
+      text: gyógytorna, lézer, mágnes
+  stepsTitle: Hogyan Működik?
+  steps:
+    - Reggel diagnózis
+    - Délután terápiás terv
+    - A nap végére pontos cselekvési tervvel távozol
+  programsTitle: Válaszd a hozzád illő MoveWell programot
+  programs:
+    - name: MoveWell | Balance & Recovery
+      text: Egy nap alatt pontos képalkotó diagnózis (MR vagy ultrahang), szakorvosi konzultáció és személyre szabott terápiás terv — gyógytorna, lézer- és mágneskezelés kombinációjával. Egy nap alatt iránytűt kapsz a gyógyuláshoz, nem újabb bizonytalanságot.
+      cta: { name: Balance csomag foglalása, page: /kapcsolat }
+    - name: MoveWell | Sport & Performance
+      text: Egy nap alatt teljes diagnózis (MR vagy röntgen), szakorvosi értékelés és azonnali rehabilitációs indulás – gyógytorna, lézer és mágneses kezelés kombinációjával. Professzionális RTP-szemlélet és objektív mérőpontok a gyors, biztonságos visszatérésért.
+      cta: { name: Sport csomag foglalása, page: /kapcsolat }
+  bookingPrompt: Időpontot foglalna MoveWell szolgáltatásunkra?
+  dayTitle: MoveWell Idővonal
+  day:
+    - time: '08:00–10:00'
+      title: Diagnosztika
+      text: MRI vagy röntgen vizsgálat a sérülés pontos feltérképezéséhez.
+    - time: '10:00–11:00'
+      title: Radiológiai lelet
+      text: A képi diagnosztika eredményeit azonnal értékeljük.
+    - time: '11:00–13:00'
+      title: Szakorvosi konzultáció
+      text: Sportorvos vagy ortopéd szakorvos állítja össze a kezelési tervet.
+    - time: '13:00–16:00'
+      title: Rehabilitáció
+      text: Gyógytorna, lézer- és mágnesterápia a gyors regenerációért.
+    - time: '16:00–17:00'
+      title: Zárás
+      text: Eredmények összegzése, otthoni program és kontroll-időpont egyeztetése.
+  teamTitle: A MoveWell mögött álló csapat
+  team:
+    - name: Szekér Zoltán
+      role: ízületi és sport MR specialista
+      photo: '@assets/site/q04gVQnhLIpRObPgqjuNG0x8JY.jpg'
+  faq:
+    title: Gyakran Ismételt Kérdések
+    items:
+      - question: Mennyi ideig tart az egynapos folyamat?
+        answer: A MoveWell diagnosztikai és rehabilitációs folyamat általában 08:00 és 17:00 óra között zajlik, a vizsgálat típusától és a betegforgalomtól függően.
+      - question: Kell-e beutaló a vizsgálathoz?
+        answer: Nem, beutaló nem szükséges. Pácienseink közvetlenül is bejelentkezhetnek MRI- vagy egyéb diagnosztikai vizsgálatainkra.
+      - question: Mi a teendő, ha hétvégén sérülök meg?
+        answer: MRI diagnosztikai ügyeletünk hétvégén is elérhető, így sürgős esetben is biztosított a gyors és pontos vizsgálat.
+      - question: Biztosító/finanszírozás opciók?
+        answer: |-
+          A Medical Pointnál a vizsgálatok és kezelések díját több egészségpénztáron keresztül is rendezheti, így pácienseink rugalmasan választhatják meg a számukra legkényelmesebb finanszírozási módot.
+
+          Egészségpénztári partnereink:
+
+          - Prémium Egészség- és Önsegélyező Pénztár
+          - OTP Egészség- és Önsegélyező Pénztár
+          - Allianz Egészség- és Önsegélyező Pénztár
+          - Medicina Egészségpénztár
+          - Patika Egészségpénztár
+          - Generali Egészség- és Önsegélyező Pénztár
+          - Vitamin Egészség- és Önsegélyező Pénztár
+          - Vasutas Egészségpénztár
+
+          Amennyiben nem biztos benne, hogy az Ön egészségpénztára szerepel partnereink között, munkatársaink készséggel segítenek a részletekben.
+      - question: Vannak-e ellenjavallatok az MRI-vizsgálathoz?
+        answer: Az MRI-vizsgálat előtt fontos, hogy tájékoztassa a szakszemélyzetet,ha a szervezetében bármilyen fémes eszköz található (például pacemaker, aneurysmaclip, gyógyszeradagoló készülék vagy implantátum). Terhesség esetén az MRI csak szakorvosi javaslatra végezhető el. Bizonyos esetekben kontrasztanyag adása is szükségessé válhat, ha korábban bármilyen mellékhatást tapasztalt, kérjük, jelezze a kollégáknak. Intézményünkben minden esetben biztosított a megfelelő orvosi háttér az esetleges allergiás reakciók biztonságos kezeléséhez.
+- id: en/movewell
+  title: MoveWell Rehabilitation – Caring Medical Center | Musculoskeletal Therapy
+  description: 'Caring Medical Center MoveWell program: personalized musculoskeletal rehabilitation, physical therapy and regeneration for a faster recovery, backed by diagnostics.'
+  eyebrow: MoveWell
+  heading: MoveWell – Diagnosis and a solution in one day
+  lead: 'For sports injuries and chronic musculoskeletal problems: diagnostics → specialist opinion → therapy → rehabilitation, all in one place.'
+  image: '@assets/site/gXdr0jvChbYoDPt0fztNXXwps8.jpg'
+  imageAlt: A patient exercising at the wall bars at Medical Point
+  phone: '+3618009772'
+  benefitsTitle: Why choose MoveWell
+  benefits:
+    - title: Fast access
+      text: an exam within 24–72 hours
+    - title: Complete care in one day
+      text: diagnosis + therapy
+    - title: Personalized rehabilitation
+      text: physiotherapy, laser, magnetic therapy
+  stepsTitle: How does it work?
+  steps:
+    - Diagnosis in the morning
+    - A treatment plan in the afternoon
+    - By the end of the day, you leave with a clear action plan
+  programsTitle: Choose the MoveWell program that suits you
+  programs:
+    - name: MoveWell | Balance & Recovery
+      text: In one day, an accurate imaging diagnosis (MRI or ultrasound), a specialist consultation and a personalized treatment plan — combining physiotherapy, laser and magnetic therapy. In one day, you get a compass for your recovery, not more uncertainty.
+      cta: { name: Book the Balance package, page: /kapcsolat }
+    - name: MoveWell | Sport & Performance
+      text: In one day, a complete diagnosis (MRI or X-ray), a specialist assessment and an immediate start to rehabilitation – combining physiotherapy, laser and magnetic therapy. A professional return-to-play (RTP) approach and objective measurement points for a fast, safe return.
+      cta: { name: Book the Sport package, page: /kapcsolat }
+  bookingPrompt: Would you like to book a MoveWell appointment?
+  dayTitle: MoveWell timeline
+  day:
+    - time: '08:00–10:00'
+      title: Diagnostics
+      text: An MRI or X-ray scan to map the injury precisely.
+    - time: '10:00–11:00'
+      title: Radiology report
+      text: We assess the imaging results straight away.
+    - time: '11:00–13:00'
+      title: Specialist consultation
+      text: A sports medicine doctor or an orthopedic specialist draws up the treatment plan.
+    - time: '13:00–16:00'
+      title: Rehabilitation
+      text: Physiotherapy, laser and magnetic therapy for fast recovery.
+    - time: '16:00–17:00'
+      title: Wrap-up
+      text: A summary of the results, a home exercise program and booking a follow-up appointment.
+  teamTitle: The team behind MoveWell
+  team:
+    - name: Szekér Zoltán
+      role: joint and sports MRI specialist
+      photo: '@assets/site/q04gVQnhLIpRObPgqjuNG0x8JY.jpg'
+  faq:
+    title: Frequently asked questions
+    items:
+      - question: How long does the one-day process take?
+        answer: The MoveWell diagnostic and rehabilitation process usually runs between 08:00 and 17:00, depending on the type of exam and how busy the clinic is.
+      - question: Do I need a referral for the exam?
+        answer: No, you don't need a referral. You can book our MRI and other diagnostic exams directly.
+      - question: What should I do if I get injured on the weekend?
+        answer: Our on-call MRI diagnostic service is also available on weekends, so you can get a fast, accurate exam even in urgent cases.
+      - question: Insurance and payment options?
+        answer: |-
+          At Medical Point, you can pay for exams and treatments through several Hungarian health funds, so you can choose the payment method that suits you best.
+
+          Our health fund partners:
+
+          - Prémium Egészség- és Önsegélyező Pénztár
+          - OTP Egészség- és Önsegélyező Pénztár
+          - Allianz Egészség- és Önsegélyező Pénztár
+          - Medicina Egészségpénztár
+          - Patika Egészségpénztár
+          - Generali Egészség- és Önsegélyező Pénztár
+          - Vitamin Egészség- és Önsegélyező Pénztár
+          - Vasutas Egészségpénztár
+
+          If you are not sure whether your health fund is one of our partners, our staff will be happy to help with the details.
+      - question: Are there any contraindications for an MRI scan?
+        answer: Before an MRI scan, it is important to tell the staff if you have any metal device in your body (for example a pacemaker, an aneurysm clip, a drug delivery device or an implant). During pregnancy, an MRI can only be done on a specialist's recommendation. In some cases, a contrast agent may also be needed; if you have had any side effects before, please tell our staff. Our facility always has the right medical support in place to safely manage any allergic reaction.

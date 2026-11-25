@@ -1,0 +1,93 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import ClosingCta from '../components/ClosingCta.astro';
+import NewsCard from '../components/NewsCard.astro';
+import PageHero from '../components/PageHero.astro';
+import Base from '../layouts/Base.astro';
+// The hero shows a clinic, not the lead story's photo, which the first card already shows.
+import photo from '../assets/site/budaors-varo.jpg';
+import { formatDate } from '../lib/format';
+import { localeOf, localId, sectionId } from '../lib/locale';
+import { ui } from '../lib/ui';
+
+const locale = localeOf(Astro.url);
+const t = ui[locale].news;
+const page = await getEntry('pages', localId('hirek', locale));
+if (!page) throw new Error(`Missing src/content/pages/${localId('hirek', locale)}.md`);
+
+const section = `${sectionId('hirek', locale)}/`;
+const articles = (await getCollection('site', (e) => e.id.startsWith(section)))
+  .map((article) => {
+    const { date } = article.data;
+    if (!date) throw new Error(`${article.id} needs a date`);
+    return { ...article, date };
+  })
+  .sort((a, b) => b.date.getTime() - a.date.getTime());
+// Every article stays on the one page, grouped by year, newest first. Dates are midnight
+// UTC (see formatDate), so the UTC year is the Budapest year.
+const years = [...Map.groupBy(articles, (a) => a.date.getUTCFullYear())];
+const lead = articles[0];
+---
+
+<Base title={page.data.title} description={page.data.description}>
+  <PageHero short eyebrow={t.eyebrow} title={page.data.heading} image={{ src: photo, alt: t.heroAlt }}>
+    <nav aria-label={t.byYear} class="mt-6">
+      <ul class="flex flex-wrap gap-2">
+        {
+          years.map(([year]) => (
+            <li>
+              <a
+                href={`#ev-${year}`}
+                class="inline-flex h-11 items-center rounded-full border-[1.5px] border-cream/50 px-4 font-bold tabular-nums hover:border-cream"
+              >
+                {year}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </PageHero>
+
+  <div class="mx-auto grid max-w-6xl gap-16 px-4 pt-12 pb-16 lg:pb-20">
+    {
+      years.map(([year, items]) => {
+        // Articles with a picture are cards; the archive has none, so it reads as a dated index of titles.
+        const cards = items.filter((a) => a.data.image);
+        const rows = items.filter((a) => !a.data.image);
+        return (
+          <section id={`ev-${year}`} aria-labelledby={`ev-${year}-cim`} class="scroll-mt-4">
+            <h2 id={`ev-${year}-cim`} class="text-2xl font-semibold tabular-nums">
+              {year}
+            </h2>
+            {cards.length > 0 && (
+              <ul class="mt-6 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+                {cards.map((article) => (
+                  <NewsCard article={article} lead={article === lead} />
+                ))}
+              </ul>
+            )}
+            {rows.length > 0 && (
+              <ul class:list={['divide-y divide-line', cards.length > 0 ? 'mt-10' : 'mt-4']}>
+                {rows.map(({ id, date, data }) => (
+                  <li class="relative grid gap-x-8 gap-y-0.5 py-3 sm:grid-cols-[9rem_minmax(0,1fr)]">
+                    <time datetime={date.toISOString().slice(0, 10)} class="text-sm text-ink-muted sm:pt-0.5">
+                      {formatDate(date, locale)}
+                    </time>
+                    <h3 class="max-w-[36rem] leading-snug font-bold text-balance">
+                      <a href={`/${id}`} class="link-bar after:absolute after:inset-0">
+                        {data.heading}
+                      </a>
+                    </h3>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        );
+      })
+    }
+  </div>
+
+  <ClosingCta />
+</Base>

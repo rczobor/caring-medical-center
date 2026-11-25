@@ -1,0 +1,19 @@
+---
+import type { ComponentProps } from 'astro/types';
+import { uiFor } from '../lib/ui';
+import BookingOptions from './BookingOptions.astro';
+
+type Props = Pick<ComponentProps<typeof BookingOptions>, 'bookings'>;
+const { bookings } = Astro.props;
+const t = uiFor(Astro.url);
+// Say once where online booking continues.
+const systems = [...new Set(bookings.map((b) => b.system))];
+---
+
+<section id="foglalas" aria-labelledby="foglalas-cim" data-pagefind-ignore class="scroll-mt-4 rounded-md border border-ink/20 bg-paper">
+  <div class="border-b border-line px-5 pt-5 pb-4">
+    <h2 id="foglalas-cim" class="text-xl font-semibold">{t.book}</h2>
+    <p class="mt-1 text-sm text-ink-muted">{t.bookingPanel.intro(bookings.length, systems)}</p>
+  </div>
+  <BookingOptions bookings={bookings} />
+</section>

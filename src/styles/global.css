@@ -1,0 +1,293 @@
+@import 'tailwindcss';
+
+/*
+ * Brand colours, adjusted for WCAG AA.
+ * The brand gold (#d2bb5b) is a surface colour: put ink on it (9.0:1), never
+ * white (1.9:1). Use gold-ink for gold text on
+ * light backgrounds (5.3:1 on cream).
+ */
+@theme {
+  --color-gold: #d2bb5b;
+  --color-gold-ink: #7a6620;
+  --color-cream: #fbfaef;
+  --color-paper: #ffffff;
+  --color-ink: #1c1b17;
+  --color-ink-muted: #55524a;
+  --color-line: #e6e2d3;
+  /*
+   * The home page's dark surfaces (direction A, the reading room): a deep green-ink, a raised
+   * step for panels on it, and a muted text tone. Cream on night 16:1, gold on night 8.8:1,
+   * mist on night 8.9:1, mist on night-raised 8.0:1.
+   */
+  --color-night: #13201b;
+  --color-night-raised: #1a2924;
+  --color-mist: #b8bfb3;
+}
+
+/* The font variables are defined at runtime by Astro's <Font> component. */
+@theme inline {
+  --font-sans: var(--font-source-sans);
+  --font-display: var(--font-instrument), var(--font-source-sans);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+  }
+  /*
+   * Page and section headings in the display face on every page, as on home; Source Sans 3
+   * stays for reading. Small headings (clinic and doctor names, card titles) stay in Source
+   * Sans 3: Instrument Sans sets its word spaces tight, and bold names at 16 px run together.
+   */
+  h1,
+  h2 {
+    @apply font-display tracking-[-0.015em];
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-gold-ink;
+  }
+  /* On the dark bands gold-ink barely shows; the brand gold reads there. */
+  .bg-night :focus-visible {
+    @apply outline-gold;
+  }
+}
+
+/*
+ * Linked titles get a gold bar that grows under the text on hover or focus, in place
+ * of a hard underline or a trailing arrow.
+ */
+@layer components {
+  /*
+   * A component, not an @utility: the hover rule below must outrank it, and the
+   * utilities layer would beat any components rule whatever its specificity.
+   * Index cards written in Markdown get it by selector.
+   */
+  .link-bar,
+  .copy ul:has(> li > :is(h2, h3)) :is(h2, h3) a {
+    padding-bottom: 0.12em;
+    background: linear-gradient(var(--color-gold), var(--color-gold)) 0 100% / 0 3px no-repeat;
+    text-decoration: none;
+    transition: background-size 250ms ease-out;
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+  /*
+   * Hovering or focusing the link draws the bar; so does any hover or focus on a card whose
+   * whole area is one link (.link-card), and a clinic card or map marker picked out by its
+   * partner (ClinicMap.astro sets data-active on both). The current page keeps it.
+   */
+  :is(a:hover, a:focus-visible, .link-card:is(:hover, :focus-within)) .link-bar,
+  a.link-bar:is(:hover, :focus-visible, [aria-current='page']),
+  [data-clinic][data-active] .link-bar {
+    background-size: 100% 3px;
+  }
+}
+
+/* Markdown copy (exam bodies, service texts). */
+@layer components {
+  .copy {
+    @apply text-[1.0625rem] leading-[1.65];
+  }
+  .copy > * + * {
+    margin-top: 0.85em;
+  }
+  .copy > :first-child {
+    margin-top: 0;
+  }
+  .copy > :last-child {
+    margin-bottom: 0;
+  }
+  /*
+   * Keep running text near 70 characters per line, whatever the column width.
+   * In rem, not ch: ch is the width of "0", which in most typefaces is wider than an
+   * average letter, so 68ch still allowed about 90 characters.
+   */
+  .copy > p,
+  .copy > ul,
+  .copy > ol,
+  .copy > h2,
+  .copy > h3,
+  p.copy {
+    max-width: 36rem;
+  }
+  /* The same steps as the exam pages' section headings, so long copy has clear landmarks. */
+  .copy h2 {
+    @apply mt-10 text-2xl leading-tight font-semibold text-ink;
+  }
+  .copy h3 {
+    @apply mt-8 font-display text-xl leading-snug font-semibold tracking-[-0.01em] text-ink;
+  }
+  .copy ul {
+    @apply list-disc space-y-1.5 pl-5 marker:text-gold-ink;
+  }
+  .copy a {
+    @apply text-gold-ink underline underline-offset-4;
+  }
+  /* A phone number is one fact: it never breaks across lines. */
+  .copy a[href^='tel:'] {
+    @apply whitespace-nowrap;
+  }
+  .copy strong {
+    @apply font-bold text-ink;
+  }
+  .copy img {
+    @apply w-full max-w-[36rem] rounded-md bg-line;
+  }
+  .copy ol {
+    @apply list-decimal space-y-1.5 pl-5 marker:font-bold;
+  }
+  /*
+   * Lists with pictures, told apart by their Markdown structure:
+   *   cards   "- ![](photo)" then "## [Title](/page)": the sections of an index page
+   *   logos   "- [![](logo) Name](https://…)": partners, each logo linked with its name
+   * (Doctors are data, not Markdown: src/components/DoctorPanel.astro.)
+   */
+  .copy ul:is(:has(> li > :is(h2, h3)), :has(> li > a > img)) {
+    @apply my-10 grid max-w-none list-none gap-x-6 pl-0;
+  }
+  .copy ul:is(:has(> li > :is(h2, h3)), :has(> li > a > img)) > li {
+    @apply m-0;
+  }
+
+  /* Two cards a row on phones, so an index of eight fits a few screens. */
+  .copy ul:has(> li > :is(h2, h3)) {
+    @apply grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-3;
+  }
+  /* Four cards fill one row, rather than leaving the fourth alone on a second. */
+  .copy ul:has(> li > :is(h2, h3)):has(> li:nth-child(4):last-child) {
+    @apply lg:grid-cols-4;
+  }
+  .copy ul:has(> li > :is(h2, h3)) > li {
+    @apply relative;
+  }
+  .copy ul:has(> li > :is(h2, h3)) img {
+    @apply aspect-[4/3] max-w-none object-cover;
+  }
+  /* Card titles are small: Source Sans 3, like news card titles, whose word spaces hold at 16 px. */
+  .copy ul:has(> li > :is(h2, h3)) :is(h2, h3) {
+    @apply mt-3 font-sans text-base leading-snug font-bold tracking-normal sm:text-lg;
+  }
+  .copy ul:has(> li > :is(h2, h3)) :is(h2, h3) a {
+    @apply text-ink;
+  }
+  /* The title's link covers the whole card: one link per card, the picture included. */
+  .copy ul:has(> li > :is(h2, h3)) :is(h2, h3) a::after {
+    @apply absolute inset-0 rounded-md content-[''];
+  }
+  .copy ul:has(> li > :is(h2, h3)) > li:is(:hover, :focus-within) :is(h2, h3) a {
+    background-size: 100% 3px;
+  }
+  .copy ul:has(> li > :is(h2, h3)) :is(h2, h3) a:focus-visible {
+    @apply outline-none;
+  }
+  .copy ul:has(> li > :is(h2, h3)) :is(h2, h3) a:focus-visible::after {
+    @apply outline-2 outline-offset-4 outline-gold-ink;
+  }
+
+  /*
+   * A list of bare links ("Terápiák", "Javasolt vizsgálatok"): plain columns, no bullets.
+   * CSS can't see text beside a link, so this is a heuristic on how the generator writes
+   * lists: the first and last items are a single link, and no link is bold, which marks
+   * the "[**Name**](/page) – description" lists.
+   */
+  .copy ul:has(> li:first-child > a:only-child):has(> li:last-child > a:only-child):not(:has(> li > a > :is(strong, img))) {
+    @apply list-none gap-x-8 space-y-0 pl-0 sm:columns-2;
+  }
+  .copy ul:has(> li:first-child > a:only-child):has(> li:last-child > a:only-child):not(:has(> li > a > :is(strong, img))) > li {
+    @apply break-inside-avoid;
+  }
+  /* A 44 px tap target per link. */
+  .copy ul:has(> li:first-child > a:only-child):has(> li:last-child > a:only-child):not(:has(> li > a > :is(strong, img))) > li > a {
+    @apply inline-block py-2.5;
+  }
+
+  .copy ul:has(> li > a > img) {
+    @apply grid-cols-2 gap-y-6 sm:grid-cols-3 lg:grid-cols-4;
+  }
+  .copy ul:has(> li > a > img) a {
+    @apply grid gap-2 text-sm text-ink no-underline hover:underline;
+  }
+  .copy ul:has(> li > a > img) img {
+    @apply aspect-[5/2] max-h-20 w-auto max-w-full rounded-none bg-transparent object-contain object-left;
+  }
+}
+
+/*
+ * Motion. All of it is progressive: a browser without the feature, or a visitor who asks
+ * for reduced motion, gets the same page standing still.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  /*
+   * Page to page (opted in by Base.astro), a short crossfade; a photo both pages show
+   * (photoTransition) moves into place.
+   */
+  ::view-transition-group(*) {
+    animation-duration: 280ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+  /* The two pages crop the photo differently; cover keeps it from stretching mid-move. */
+  ::view-transition-image-pair(.photo) {
+    overflow: clip;
+    border-radius: var(--radius-md);
+  }
+  ::view-transition-old(.photo),
+  ::view-transition-new(.photo) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /*
+   * The phone menu fades in and drops into place. Only opacity on the slot: a transform
+   * there would become the containing block of the absolutely placed menu.
+   */
+  details.menu::details-content {
+    opacity: 0;
+    transition:
+      opacity 180ms ease-out,
+      content-visibility 180ms allow-discrete;
+  }
+  details.menu[open]::details-content {
+    opacity: 1;
+  }
+  details.menu[open] nav {
+    transition: translate 220ms cubic-bezier(0.2, 0, 0, 1);
+    @starting-style {
+      translate: 0 -0.5rem;
+    }
+  }
+}
+
+/* Scroll-linked effects run on the compositor, tied to scroll position: no script, no observers. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Content settles in as it scrolls into view; what is on screen at load is already in place. */
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 80%;
+    }
+    /* The gold line between two steps draws downward as the reader moves through them. */
+    .draw-down {
+      transform-origin: top;
+      animation: draw-down linear both;
+      animation-timeline: view();
+      animation-range: entry 30% cover 55%;
+    }
+  }
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 1.25rem;
+  }
+}
+@keyframes draw-down {
+  from {
+    scale: 1 0;
+  }
+}

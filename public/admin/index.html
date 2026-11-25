@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Szerkesztő – Caring Medical Center</title>
+    <!-- Absolute, so the config loads whether the page is opened as /admin or /admin/. -->
+    <link href="/admin/config.yml" type="application/yaml" rel="cms-config-url" />
+  </head>
+  <body>
+    <!--
+      Pinned with a hash, so a changed copy of this file can't run here. The chunks
+      and libraries it loads from unpkg at runtime are pinned by version only. To
+      upgrade, bump the version in this URL and in config.yml's $schema line, then
+      replace the hash with the new file's:
+      curl -s https://unpkg.com/@sveltia/cms@VERSION/dist/sveltia-cms.js | openssl dgst -sha384 -binary | base64
+    -->
+    <script
+      src="https://unpkg.com/@sveltia/cms@0.256.1/dist/sveltia-cms.js"
+      integrity="sha384-LPT86oZkLhmoF84O1jKZBSaFJOVvKv8sjXDKap1SOaSwzbC8F6HH7rTJWekmAzG9"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

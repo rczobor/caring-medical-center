@@ -1,0 +1,24 @@
+---
+import { getEntry } from 'astro:content';
+import { localeOf, localId } from '../lib/locale';
+import { md } from '../lib/markdown';
+import { linker } from '../lib/translations';
+import { ui } from '../lib/ui';
+
+interface Props {
+  /** Heading level for the note's title, to fit the surrounding outline. */
+  level?: 'h2' | 'h3';
+}
+const { level: Heading = 'h3' } = Astro.props;
+const locale = localeOf(Astro.url);
+const note = await getEntry('notes', localId('foglalasi-dij', locale));
+if (!note) throw new Error(`Missing src/content/notes/${localId('foglalasi-dij', locale)}.md`);
+const link = await linker(locale);
+---
+
+<!-- The deposit summary; the full terms are on the contact page. -->
+<div class="copy rounded-md bg-cream px-5 py-4 text-[0.95rem]">
+  <Heading>{note.data.title}</Heading>
+  <Fragment set:html={md(note.data.summary)} />
+  <p><a href={link('/kapcsolat#foglalasi-dij')}>{ui[locale].deposit.terms}</a></p>
+</div>
