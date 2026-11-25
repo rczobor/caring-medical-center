@@ -11,7 +11,7 @@
  */
 
 interface Layer {
-  kind: 'dot' | 'clump' | 'bokeh';
+  kind: 'dot' | 'clump';
   /** Flakes per 390 × 844 px, before the density factor. */
   n: number;
   rMin: number;
@@ -33,7 +33,7 @@ const LAYERS: Layer[] = [
   { kind: 'dot', n: 150, rMin: 0.8, rMax: 1.3, vMin: 52, vMax: 78, aMin: 0.28, aMax: 0.5, slant: 9, fMin: 0.5, fMax: 1.2, wind: 0.5 },
   { kind: 'clump', n: 85, rMin: 1.5, rMax: 2.4, vMin: 78, vMax: 112, aMin: 0.5, aMax: 0.78, slant: 12, fMin: 0.8, fMax: 1.8, wind: 0.8, tumble: true, settle: true },
   { kind: 'clump', n: 22, rMin: 2.6, rMax: 4, vMin: 108, vMax: 148, aMin: 0.55, aMax: 0.85, slant: 16, fMin: 1, fMax: 2.4, wind: 1, tumble: true, settle: true },
-  { kind: 'bokeh', n: 4, rMin: 5, rMax: 8, vMin: 125, vMax: 160, aMin: 0.06, aMax: 0.13, slant: 18, fMin: 0, fMax: 0, wind: 1.2 },
+  // No blurred near-flakes (Weather has a few): on the green-black band they read as smudges.
 ];
 /** The mockup's "medium": 70% of Weather's density, to spare battery. */
 const DENSITY = 0.7;
@@ -104,15 +104,6 @@ function makeSprite(kind: Layer['kind']) {
   const g = c.getContext('2d');
   if (!g) return c;
   const m = SPRITE / 2;
-  if (kind === 'bokeh') {
-    const grad = g.createRadialGradient(m, m, 0, m, m, m - 2);
-    grad.addColorStop(0, 'rgba(255,255,255,0.8)');
-    grad.addColorStop(0.6, 'rgba(255,255,255,0.55)');
-    grad.addColorStop(1, 'rgba(255,255,255,0)');
-    g.fillStyle = grad;
-    g.fillRect(0, 0, SPRITE, SPRITE);
-    return c;
-  }
   g.shadowColor = 'rgba(240,244,250,0.6)';
   g.shadowBlur = 2;
   g.fillStyle = 'rgb(236,240,247)';
