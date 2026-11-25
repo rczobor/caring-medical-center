@@ -342,8 +342,9 @@ export function startSnow(canvas: HTMLCanvasElement) {
     }
   });
   new ResizeObserver(resize).observe(canvas);
-  new IntersectionObserver(([entry]) => {
-    onScreen = entry?.isIntersecting ?? true;
+  // The last entry: one busy-thread callback can carry both leaving and coming back.
+  new IntersectionObserver((entries) => {
+    onScreen = entries.at(-1)?.isIntersecting ?? true;
     run();
   }).observe(scene);
   document.addEventListener('visibilitychange', run);

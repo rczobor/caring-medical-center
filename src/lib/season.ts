@@ -10,7 +10,9 @@
 export function isChristmas(now: Date, override?: string | null): boolean {
   if (override === 'christmas') return true;
   if (override === 'off') return false;
-  // "12-01": month and day, which compare as text.
-  const monthDay = now.toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest', month: '2-digit', day: '2-digit' });
-  return monthDay >= '12-01' || monthDay <= '01-06';
+  // Read as numbers, not as formatted text: a browser's date format can change between versions.
+  const parts = new Intl.DateTimeFormat('en', { timeZone: 'Europe/Budapest', month: 'numeric', day: 'numeric' }).formatToParts(now);
+  const part = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find((p) => p.type === type)?.value);
+  const month = part('month');
+  return month === 12 || (month === 1 && part('day') <= 6);
 }
