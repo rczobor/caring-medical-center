@@ -102,8 +102,7 @@ const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-b
       <span aria-hidden="true" class="light absolute inset-x-0 bottom-0 h-[3px] bg-gold lg:inset-x-auto lg:inset-y-0 lg:left-0 lg:h-auto lg:w-[3px]"></span>
       <HolidayTree />
     </div>
-    <!-- Above the season's snow (z-1), below its snowbank (z-3). -->
-    <div class="hero-copy relative z-[2] mx-auto max-w-6xl px-4 pt-6 pb-6 sm:pt-8 lg:py-20">
+    <div class="hero-copy mx-auto max-w-6xl px-4 pt-6 pb-6 sm:pt-8 lg:py-20">
       <div class="lg:w-[52%] lg:pr-6">
         <h1 id="fooldal-cim" data-snow-quiet class="font-display text-[clamp(2.25rem,6vw,4.75rem)] leading-[0.98] font-semibold tracking-[-0.035em] text-balance">{home.heading}</h1>
         <p data-snow-quiet class="mt-4 max-w-[30rem] text-lg text-mist sm:mt-5 sm:text-xl">{home.lead}</p>
@@ -613,13 +612,22 @@ const pairTitle = 'font-display text-3xl font-semibold tracking-[-0.02em] text-b
     }
   }
   /*
+   * In the Christmas season the copy sits above the snow (z-1) and below the snowbank (z-3). Only
+   * then: out of season a positioned layer would change how the browser smooths its text.
+   */
+  :global(:root[data-season='christmas']) .hero-copy {
+    position: relative;
+    z-index: 2;
+  }
+  /*
    * In the Christmas season, below desktop width, the photo strip starts under a slim dark eave
    * where HolidayDecor's lights hang, so no bulb lands on a face in the photo; and the snowbank
    * needs room under the price figures.
    */
   @media (max-width: 63.99rem) {
     :global(:root[data-season='christmas']) .hero-photo {
-      margin-top: 1.5rem;
+      /* At least the bulbs' 24 px drop, also with a small default font. */
+      margin-top: max(1.5rem, 24px);
     }
     :global(:root[data-season='christmas']) .hero-copy {
       padding-bottom: 2.5rem;

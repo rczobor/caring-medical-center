@@ -43,7 +43,7 @@ async function expectLinksClickable(page: Page) {
   }
 }
 
-for (const width of [320, 390, 768, 1024, 1280, 1920, 2560]) {
+for (const width of [320, 390, 768, 1024, 1280, 1920, 2560, 3840]) {
   test.describe(`at ${width}px`, () => {
     test.use({ viewport: { width, height: 900 } });
 
@@ -133,6 +133,34 @@ for (const width of [320, 360, 430]) {
     });
   }
 }
+
+// The text-smoothing a positioned layer changes would make the plain page differ from the
+// undecorated one.
+test('out of season the hero copy is laid out as without the season, and in season it sits above the snow', async ({ page }) => {
+  const layer = () => page.locator('.hero-copy').evaluate((el) => `${getComputedStyle(el).position} ${getComputedStyle(el).zIndex}`);
+  await page.goto('/?season=off');
+  expect(await layer()).toBe('static auto');
+  await page.goto('/?season=christmas');
+  expect(await layer()).toBe('relative 2');
+});
+
+test('the bulbs flicker on their own keyframes, not the tree baubles\' gentler ones', async ({ page }) => {
+  await page.goto('/?season=christmas');
+  const dips = (selector: string) =>
+    page.locator(selector).first().evaluate((el) => el.getAnimations().flatMap(({ effect }) => (effect instanceof KeyframeEffect ? effect.getKeyframes() : []).map((k) => Number(k.opacity))));
+  expect(Math.min(...(await dips('.hero .bulb')))).toBe(0.4);
+  expect(Math.min(...(await dips('.hero .tree .ornament')))).toBe(0.55);
+});
+
+test('with a small default text size on a phone, the lights still hang clear of the photo', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Page.setFontSizes', { fontSizes: { standard: 12 } });
+  await page.goto('/?season=christmas');
+  const photo = await box(page.locator('.hero-photo'));
+  const lowestBulb = await decorations(page).bulbs.evaluateAll((els) => Math.max(...els.map((el) => el.getBoundingClientRect().bottom)));
+  expect(lowestBulb).toBeLessThanOrEqual(photo.y + 2);
+});
 
 test('reduced motion stops the twinkle and the star', async ({ page }) => {
   const running = () =>

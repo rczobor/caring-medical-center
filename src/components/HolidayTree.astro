@@ -63,12 +63,13 @@ const caps = ['M35.6 22.4 Q37 21 38.6 22.9 Q37 22.3 35.9 23.1 Z', 'M41.4 38.6 Q4
 
 <style>
   .ornament {
-    animation: twinkle 2.4s ease-in-out infinite;
+    animation: ornament-twinkle 2.4s ease-in-out infinite;
   }
   .star {
-    animation: pulse 3s ease-in-out infinite;
+    animation: star-pulse 3s ease-in-out infinite;
   }
-  @keyframes twinkle {
+  /* Keyframe names are global in Astro, so each is named for its component. */
+  @keyframes ornament-twinkle {
     0%,
     100% {
       opacity: 1;
@@ -77,7 +78,7 @@ const caps = ['M35.6 22.4 Q37 21 38.6 22.9 Q37 22.3 35.9 23.1 Z', 'M41.4 38.6 Q4
       opacity: 0.55;
     }
   }
-  @keyframes pulse {
+  @keyframes star-pulse {
     50% {
       opacity: 0.75;
     }

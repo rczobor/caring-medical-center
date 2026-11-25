@@ -39,6 +39,16 @@ test('out of season the snow never loads and nothing is drawn', async ({ page })
   expect(scripts.filter((url) => /snow/i.test(url))).toEqual([]);
 });
 
+test('if the snow fails to load, the page carries on without an error', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.route(/snow.*\.js$/, (route) => route.abort());
+  await page.goto('/?season=christmas');
+  await page.waitForLoadState('networkidle');
+  expect(errors).toEqual([]);
+  await expect(page.locator('.hero h1')).toBeVisible();
+});
+
 test('the snow stops while the hero is scrolled away and falls again on return', async ({ page }) => {
   await page.goto('/?season=christmas');
   await expect.poll(() => moving(page)).toBe(true);

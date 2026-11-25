@@ -1,8 +1,8 @@
 ---
 /**
  * The home hero's Christmas season: falling snow, a string of lights hung under the header and a
- * snowbank leading into the page. Place it first in the hero, a positioned dark band; the
- * hero's copy needs `relative z-[2]` to stay above the snow. HolidayTree goes in the photo.
+ * snowbank leading into the page. Place it first in the hero, a positioned dark band; in season the
+ * hero's copy must be lifted to z-index 2 to stay above the snow. HolidayTree goes in the photo.
  */
 import { isChristmas } from '../lib/season';
 import { season } from '../lib/season-colors';
@@ -15,8 +15,8 @@ const colors = [season.red, season.gold, season.green, season.blue];
 // Each loop is a quadratic curve from (-4, 1) through the control point (width / 2, 1 + pull)
 // to (width + 4, 1); it sags half the pull.
 const loop = { width: 160, pull: 22 };
-// Enough loops for a 2560 px window; the row is centred and clipped.
-const loops = 16;
+// Enough loops for a 3840 px window; the row is centred and clipped.
+const loops = 24;
 const along = [0.15, 0.38, 0.62, 0.85];
 const wire = `M-4 1 Q${loop.width / 2} ${1 + loop.pull} ${loop.width + 4} 1`;
 const bulb = (u: number) => {
@@ -79,7 +79,8 @@ const rows = Array.from({ length: loops }, (_, l) =>
   // The snow loads only in season, so the rest of the year costs one small check.
   const canvas = document.querySelector<HTMLCanvasElement>('canvas[data-snow]');
   if (canvas && document.documentElement.dataset.season === 'christmas') {
-    void import('../lib/snow').then(({ startSnow }) => startSnow(canvas));
+    // Snow is decoration: if its chunk fails to load, the page just stays without it.
+    import('../lib/snow').then(({ startSnow }) => startSnow(canvas)).catch(() => {});
   }
 </script>
 
@@ -90,7 +91,7 @@ const rows = Array.from({ length: loops }, (_, l) =>
     height: 12px;
     border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
     box-shadow: 0 0 9px 2px var(--glow);
-    animation: twinkle 2.6s ease-in-out infinite;
+    animation: bulb-twinkle 2.6s ease-in-out infinite;
   }
   /* The bulb's socket. */
   .bulb::before {
@@ -103,7 +104,8 @@ const rows = Array.from({ length: loops }, (_, l) =>
     border-radius: 1px;
     background: #2b3a33;
   }
-  @keyframes twinkle {
+  /* Keyframe names are global in Astro, so each is named for its component. */
+  @keyframes bulb-twinkle {
     0%,
     100% {
       opacity: 1;
