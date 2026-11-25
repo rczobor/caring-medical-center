@@ -14,7 +14,7 @@
 
 backend:
   name: github
-  repo: rczobor/caringmedical-site
+  repo: rczobor/caring-medical-center
   branch: main
   # The sveltia-cms-auth Worker in the same Cloudflare account.
   base_url: https://sveltia-cms-auth.czobor94.workers.dev
